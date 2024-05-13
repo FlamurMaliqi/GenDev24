@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login Form</title>
+    <title>Registrierungsformular</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
@@ -15,8 +15,6 @@
 <body>
     <!-- Header -->
     <header>
-        <!-- Hier kannst du den Header deiner Website einfügen -->
-        <!-- Beispiel: -->
         <nav class="navbar navbar-dark bg-dark">
             <div class="container">
                 <a class="navbar-brand" href="#">GenDev 2024</a>
@@ -24,13 +22,13 @@
         </nav>
     </header>
 
-    <!-- Login Form -->
+    <!-- Registration Form -->
     <div class="container">
         <div class="row">
             <div class="col-md-6 offset-md-3">
-                <h2 class="text-center text-dark mt-5">Login</h2>
+                <h2 class="text-center text-dark mt-5">Registrieren</h2>
                 <div class="card my-5">
-                    <form action="http://localhost:3000/check-user" method="POST"
+                    <form action="http://localhost:3000/register-user" method="POST"
                         class="card-body cardbody-color p-lg-5">
                         <div class="text-center">
                             <img src="dog with blue hoodie.jfif"
@@ -43,11 +41,12 @@
                         </div>
                         <div class="text-center">
                             <button type="submit" class="btn btn-color px-5 mb-2 w-100">
-                                Login
+                                Registrieren
                             </button>
-                             <a href="register.html" class="btn btn-color px-5  w-100">
-                            Registrieren
-                            </a>
+                        </div>
+                        <a href="login.html" class="btn btn-color px-5  w-100">
+                            Zum Login    
+                        </a>
                         </div>
                     </form>
                 </div>

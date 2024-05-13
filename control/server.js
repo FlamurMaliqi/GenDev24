@@ -5,8 +5,24 @@ const db = require('./database');
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Endpoint zum Überprüfen und Hinzufügen von Benutzern
+// Endpoint zum Überprüfen von Benutzern
 app.post('/check-user', (req, res) => {
+    const username = req.body.username;
+
+    db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
+        if (err) {
+            return console.error(err.message);
+        }
+        if (row) {
+            res.send('Benutzer existiert.');
+        } else {
+            res.send('Benutzer existiert nicht.');
+        }
+    });
+});
+
+// Endpoint zum Hinzufügen von Benutzern
+app.post('/register-user', (req, res) => {
     const username = req.body.username;
 
     db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
