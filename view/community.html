@@ -4,11 +4,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Betting-Seite</title>
+    <title>Community-Seite</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="general.css" />
 
     <style>
         body {
@@ -42,8 +41,17 @@
             background-color: #0056b3;
         }
 
-        .form-control {
-            margin-bottom: 20px;
+        .list-unstyled {
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .list-unstyled li {
+            margin-bottom: 10px;
+        }
+
+        .list-unstyled li:last-child {
+            margin-bottom: 0;
         }
     </style>
 </head>
@@ -58,32 +66,35 @@
         </nav>
     </header>
 
-    <!-- Betting-Seite -->
+    <!-- Community-Seite -->
     <div class="container">
         <div class="row">
             <div class="col-md-8 offset-md-2">
-                <h2 class="text-center text-dark mt-5">Betting-Seite</h2>
+                <h2 class="text-center text-dark mt-5">Community-Seite</h2>
                 <div class="card my-5">
                     <div class="card-body cardbody-color p-lg-5">
-                        <h3 class="text-center mb-4">Bevorstehende Spiele</h3>
-                        <form>
-                            <div class="form-group">
-                                <label for="game1">Deutschland vs. Frankreich</label>
-                                <input type="text" class="form-control" id="game1" placeholder="Tipp eingeben">
-                            </div>
-                            <div class="form-group">
-                                <label for="game2">Portugal vs. Spanien</label>
-                                <input type="text" class="form-control" id="game2" placeholder="Tipp eingeben">
-                            </div>
-                            <div class="form-group">
-                                <label for="game3">Italien vs. England</label>
-                                <input type="text" class="form-control" id="game3" placeholder="Tipp eingeben">
-                            </div>
-                            <!-- Weitere Spiele hier einfügen -->
-                            <div class="text-center mt-4">
-                                <button type="submit" class="btn btn-color px-5 mb-5">Wette abschließen</button>
-                            </div>
-                        </form>
+                        <h3 class="text-center mb-4">Community XYZ</h3>
+                        <div class="community-info">
+                            <h4>Rangliste der Community</h4>
+                            <ul class="list-unstyled">
+                                <li>1. MaxMustermann (750 Punkte)</li>
+                                <li>2. LisaMusterfrau (600 Punkte)</li>
+                                <li>3. JohnDoe (550 Punkte)</li>
+                                <!-- Weitere Community-Mitglieder hier einfügen -->
+                            </ul>
+                        </div>
+                        <div class="community-info mt-5">
+                            <h4>Spiele der Community</h4>
+                            <ul class="list-unstyled">
+                                <li>Deutschland vs. Frankreich (2:1)</li>
+                                <li>Portugal vs. Spanien (1:1)</li>
+                                <li>Italien vs. England (3:2)</li>
+                                <!-- Weitere Spiele hier einfügen -->
+                            </ul>
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="#" class="btn btn-color px-5 mb-5">Community beitreten</a>
+                        </div>
                     </div>
                 </div>
             </div>
