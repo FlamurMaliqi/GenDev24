@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const db = require('./database');
+const path = require('path');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -14,7 +15,7 @@ app.post('/check-user', (req, res) => {
             return console.error(err.message);
         }
         if (row) {
-            res.send('Benutzer existiert.');
+            res.sendFile(path.join(__dirname, '../view/dashboard.html'));
         } else {
             res.send('Benutzer existiert nicht.');
         }
@@ -36,7 +37,7 @@ app.post('/register-user', (req, res) => {
                 if (err) {
                     return console.error(err.message);
                 }
-                res.send('Benutzer wurde hinzugefügt.');
+                res.sendFile(path.join(__dirname, '../view/dashboard.html')); 
             });
         }
     });
