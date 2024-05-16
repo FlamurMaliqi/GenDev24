@@ -3,9 +3,12 @@ const bodyParser = require('body-parser');
 const db = require('./database');
 const path = require('path');
 
+var cors = require('cors');
+
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use(cors());
 // Endpoint zum Überprüfen von Benutzern
 app.post('/check-user', (req, res) => {
     const username = req.body.username;
@@ -17,7 +20,7 @@ app.post('/check-user', (req, res) => {
         if (row) {
             res.sendFile(path.join(__dirname, '../view/dashboard.html'));
         } else {
-            res.send('Benutzer existiert nicht.');
+            res.status(404).send('Benutzer existiert nicht.');
         }
     });
 });
@@ -31,7 +34,7 @@ app.post('/register-user', (req, res) => {
             return console.error(err.message);
         }
         if (row) {
-            res.send('Benutzer existiert bereits.');
+            res.status(404).send('Benutzer existiert bereits.');
         } else {
             db.run('INSERT INTO users (username) VALUES (?)', [username], (err) => {
                 if (err) {
