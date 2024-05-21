@@ -10,6 +10,27 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
 
     <link rel="stylesheet" href="styles/general.css" />
+    <style>
+        .leaderboard-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .leaderboard-table th {
+            background-color: #f2f2f2;
+        }
+        .highlight {
+            background-color: #e6f7ff;
+        }
+        .community-preview, .global-preview {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 
 <body>
@@ -20,7 +41,7 @@
                 <a class="navbar-brand" href="dashboard.html">GenDev 2024</a>
                 <div class="navbar-nav">
                     <a class="nav-link" href="global-standings.html">Global Standings</a>
-                    <a class="nav-link" href="community.html">Community</a>
+                    <a class="nav-link" href="communities.html">Communities</a>
                     <a class="nav-link" href="bet.html">Place Bet</a>
                     <a class="nav-link" href="login.html">Logout</a>
                 </div>
@@ -31,25 +52,204 @@
     <!-- Dashboard -->
     <div class="container mt-5">
         <h2 class="text-center text-dark">Dashboard</h2>
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <h3>Current Standings</h3>
-                <ul class="list-group">
-                    <li class="list-group-item">User1 - 20 points</li>
-                    <li class="list-group-item">User2 - 18 points</li>
-                    <li class="list-group-item">User3 - 15 points</li>
-                    <!-- Add more dummy data as needed -->
-                </ul>
-                <h3 class="mt-4">Upcoming Games</h3>
-                <ul class="list-group">
-                    <li class="list-group-item">Deutschland vs. Schottland - 24.06.2024</li>
-                    <li class="list-group-item">Frankreich vs. Italien - 25.06.2024</li>
-                    <li class="list-group-item">Spanien vs. Portugal - 26.06.2024</li>
-                    <!-- Add more dummy data as needed -->
-                </ul>
-            </div>
-        </div>
-    </div>
-</body>
+        
+        <!-- Current Standings -->
+        <h3>Current Standings</h3>
+        <table class="leaderboard-table">
+            <thead>
+                <tr>
+                    <th>Pos</th>
+                    <th>+/-</th>
+                    <th>Name</th>
+                    <th>GER:SCO</th>
+                    <th>HUN:CHE</th>
+                    <th>P</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>36</td>
+                    <td>0</td>
+                    <td>Marc</td>
+                    <td>-:-</td>
+                    <td>-:-</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>36</td>
+                    <td>0</td>
+                    <td>Micha232</td>
+                    <td>-:-</td>
+                    <td>-:-</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>36</td>
+                    <td>0</td>
+                    <td>Henner</td>
+                    <td>-:-</td>
+                    <td>-:-</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>36</td>
+                    <td>0</td>
+                    <td>Ball34</td>
+                    <td>-:-</td>
+                    <td>-:-</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>36</td>
+                    <td>0</td>
+                    <td>Johannes</td>
+                    <td>-:-</td>
+                    <td>-:-</td>
+                    <td>0</td>
+                </tr>
+            </tbody>
+        </table>
 
-</html>
+        <!-- Upcoming Games -->
+        <h3 class="mt-4">Upcoming Games</h3>
+        <ul class="list-group">
+            <li class="list-group-item">Deutschland vs. Schottland - 24.06.2024</li>
+            <li class="list-group-item">Frankreich vs. Italien - 25.06.2024</li>
+            <li class="list-group-item">Spanien vs. Portugal - 26.06.2024</li>
+            <!-- Add more dummy data as needed -->
+        </ul>
+
+        <!-- Community Leaderboard Preview -->
+        <div class="community-preview">
+            <h3 class="mt-4">Community Leaderboard Preview</h3>
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>+/-</th>
+                        <th>Name</th>
+                        <th>GER:SCO</th>
+                        <th>HUN:CHE</th>
+                        <th>P</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>+3,112,316</td>
+                        <td>Lukas</td>
+                        <td>1:2</td>
+                        <td>0:2</td>
+                        <td>24</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>+3,112,316</td>
+                        <td>BayernFan</td>
+                        <td>1:2</td>
+                        <td>0:2</td>
+                        <td>24</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>+3,112,316</td>
+                        <td>123987</td>
+                        <td>1:2</td>
+                        <td>0:2</td>
+                        <td>24</td>
+                    </tr>
+                    <tr class="highlight">
+                        <td>1,111,924</td>
+                        <td>+2,000,393</td>
+                        <td>Henner</td>
+                        <td>0:1</td>
+                        <td>2:2</td>
+                        <td>6</td>
+                    </tr>
+                    <tr>
+                        <td>1,111,989</td>
+                        <td>+2,000,328</td>
+                        <td>Jvh</td>
+                        <td>1:0</td>
+                        <td>0:0</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>1,111,989</td>
+                        <td>+2,000,328</td>
+                        <td>Charly</td>
+                        <td>3:1</td>
+                        <td>1:1</td>
+                        <td>4</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Global Leaderboard Preview -->
+        <div class="global-preview">
+            <h3 class="mt-4">Global Leaderboard Preview</h3>
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>+/-</th>
+                        <th>Name</th>
+                        <th>GER:SCO</th>
+                        <th>HUN:CHE</th>
+                        <th>P</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>+3,112,316</td>
+                        <td>Lukas</td>
+                        <td>1:2</td>
+                        <td>0:2</td>
+                        <td>24</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>+3,112,316</td>
+                        <td>BayernFan</td>
+                        <td>1:2</td>
+                        <td>0:2</td>
+                        <td>24</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>+3,112,316</td>
+                        <td>123987</td>
+                        <td>1:2</td>
+                        <td>0:2</td>
+                        <td>24</td>
+                    </tr>
+                    <tr class="highlight">
+                        <td>1,111,924</td>
+                        <td>+2,000,393</td>
+                        <td>Henner</td>
+                        <td>0:1</td>
+                        <td>2:2</td>
+                        <td>6</td>
+                    </tr>
+                    <tr>
+                        <td>1,111,989</td>
+                        <td>+2,000,328</td>
+                        <td>Jvh</td>
+                        <td>1:0</td>
+                        <td>0:0</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>1,111,989</td>
+                        <td>+2,000,328</td>
+                        <td>Charly</td>
+                        <td>3:1</td>
+                        <td>1:1</td>
+                        <td>4</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+   

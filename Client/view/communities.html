@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Community A</title>
+    <title>Communities</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
@@ -28,49 +28,22 @@
         </nav>
     </header>
 
-    <!-- Community Leaderboard -->
+    <!-- Communities -->
     <div class="container mt-5">
-        <h2 class="text-center text-dark">Community A Leaderboard</h2>
+        <h2 class="text-center text-dark">Communities</h2>
         <div class="row">
             <div class="col-md-8 offset-md-2">
-                <h3>Top 3 Users</h3>
+                <h3>Your Communities</h3>
                 <ul class="list-group">
-                    <li class="list-group-item">User1 - 20 points</li>
-                    <li class="list-group-item">User2 - 18 points</li>
-                    <li class="list-group-item">User3 - 15 points</li>
+                    <li class="list-group-item"><a href="community.html">Community A</a></li>
+                    <li class="list-group-item"><a href="community.html">Community B</a></li>
+                    <li class="list-group-item"><a href="community.html">Community C</a></li>
+                    <!-- Add more communities as needed -->
                 </ul>
-                <h3 class="mt-4">Your Position</h3>
-                <ul class="list-group">
-                    <li class="list-group-item">Logged-in User - 12 points</li>
-                </ul>
-                <h3 class="mt-4">Last Place</h3>
-                <ul class="list-group">
-                    <li class="list-group-item">User10 - 5 points</li>
-                </ul>
-                <h3 class="mt-4">Pinned Users</h3>
-                <ul class="list-group">
-                    <li class="list-group-item">PinnedUser1 - 14 points</li>
-                    <li class="list-group-item">PinnedUser2 - 10 points</li>
-                </ul>
-                <h3 class="mt-4">Search User</h3>
-                <form>
-                    <div class="form-group">
-                        <input type="text" class="form-control" id="searchUser" placeholder="Enter username" />
-                    </div>
-                    <button type="button" class="btn btn-dark btn-block" onclick="searchUser()">Search</button>
-                </form>
+                <a href="create-community.html" class="btn btn-dark btn-block mt-4">Create New Community</a>
             </div>
         </div>
     </div>
-
-    <script>
-        function searchUser() 
-        { 
-            var username = document.getElementById("searchUser").value;
-            alert("Searching for user: " + username);
-            // Add the logic to search for the user within the community leaderboard
-        }
-    </script>
 </body>
 
 </html>
