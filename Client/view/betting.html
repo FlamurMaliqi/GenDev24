@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Betting-Seite</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="styles/general.css" />
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            background-color: #343a40 !important;
+        }
+
+        .cardbody-color {
+            background-color: #fff;
+        }
+
+        .dashboard-section {
+            border-top: 1px solid #dee2e6;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .btn-color {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-color:hover {
+            background-color: #0056b3;
+        }
+
+        .form-control {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="navbar navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="#">GenDev 2024</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Betting-Seite -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h2 class="text-center text-dark mt-5">Betting-Seite</h2>
+                <div class="card my-5">
+                    <div class="card-body cardbody-color p-lg-5">
+                        <h3 class="text-center mb-4">Bevorstehende Spiele</h3>
+                        <form>
+                            <div class="form-group">
+                                <label for="game1">Deutschland vs. Frankreich</label>
+                                <input type="text" class="form-control" id="game1" placeholder="Tipp eingeben">
+                            </div>
+                            <div class="form-group">
+                                <label for="game2">Portugal vs. Spanien</label>
+                                <input type="text" class="form-control" id="game2" placeholder="Tipp eingeben">
+                            </div>
+                            <div class="form-group">
+                                <label for="game3">Italien vs. England</label>
+                                <input type="text" class="form-control" id="game3" placeholder="Tipp eingeben">
+                            </div>
+                            <!-- Weitere Spiele hier einfügen -->
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-color px-5 mb-5">Wette abschließen</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

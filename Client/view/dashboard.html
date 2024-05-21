@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Startseite / Dashboard</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    
+    <link rel="stylesheet" href="styles/general.css" />
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            background-color: #343a40 !important;
+        }
+
+        .cardbody-color {
+            background-color: #fff;
+        }
+
+        .dashboard-section {
+            border-top: 1px solid #dee2e6;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .btn-color {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-color:hover {
+            background-color: #0056b3;
+        }
+
+        .list-unstyled {
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .list-unstyled li {
+            margin-bottom: 10px;
+        }
+
+        .list-unstyled li:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="navbar navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="#">GenDev 2024</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Dashboard -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h2 class="text-center text-dark mt-5">Startseite / Dashboard</h2>
+                <div class="card my-5">
+                    <div class="card-body cardbody-color p-lg-5">
+                        <h3 class="text-center mb-4">Aktuelle Turnierstände und Spiele</h3>
+                        <div class="game-list">
+                            <p><strong>Gruppenspiele:</strong></p>
+                            <ul class="list-unstyled">
+                                <li>Deutschland vs. Frankreich (2:1)</li>
+                                <li>Portugal vs. Spanien (1:1)</li>
+                                <li>Italien vs. England (3:2)</li>
+                            </ul>
+                            <p><strong>Achtelfinale:</strong></p>
+                            <ul class="list-unstyled">
+                                <li>Gewinner Gruppe A vs. Zweiter Gruppe B</li>
+                                <li>Gewinner Gruppe C vs. Zweiter Gruppe D</li>
+                                <li>Gewinner Gruppe E vs. Zweiter Gruppe F</li>
+                            </ul>
+                        </div>
+                        <div class="dashboard-section mt-5">
+                            <h4>Vorschau der Community-Leaderboards</h4>
+                            <ul class="list-unstyled">
+                                <li><strong>Community A:</strong>
+                                    <ul class="list-unstyled">
+                                        <li>1. MaxMustermann (750 Punkte)</li>
+                                        <li>2. LisaMusterfrau (600 Punkte)</li>
+                                        <li>3. JohnDoe (550 Punkte)</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Community B:</strong>
+                                    <ul class="list-unstyled">
+                                        <li>1. SarahSmith (700 Punkte)</li>
+                                        <li>2. RobertMiller (650 Punkte)</li>
+                                        <li>3. EmilyJohnson (600 Punkte)</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="dashboard-section mt-5">
+                            <h4>Globales Leaderboard des Europameisterschaftsturniers</h4>
+                            <ol class="list-unstyled">
+                                <li>1. MaxMustermann (750 Punkte)</li>
+                                <li>2. SarahSmith (700 Punkte)</li>
+                                <li>3. RobertMiller (650 Punkte)</li>
+                                <li>4. LisaMusterfrau (600 Punkte)</li>
+                                <li>5. EmilyJohnson (600 Punkte)</li>
+                                <li>6. JohnDoe (550 Punkte)</li>
+                            </ol>
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="profil.html" class="btn btn-color px-5 mb-5">Zu meinem Profil</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>
