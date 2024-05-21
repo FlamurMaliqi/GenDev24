@@ -21,7 +21,7 @@ app.post('/check-user', (req, res) => {
             return res.status(500).send('Server error');
         }
         if (row) {
-            res.sendFile(path.join(__dirname, '../Client/view/dashboard.html'));
+            res.status(200).send('Benutzer ist eingeloggt.');
         } else {
             res.status(404).send('Benutzer existiert nicht.');
         }
@@ -38,14 +38,14 @@ app.post('/register-user', (req, res) => {
             return res.status(500).send('Server error');
         }
         if (row) {
-            res.status(404).send('Benutzer existiert bereits.');
+            res.status(403).send('Benutzer existiert bereits.');
         } else {
             db.run('INSERT INTO users (username) VALUES (?)', [username], (err) => {
                 if (err) {
                     console.error(err.message);
                     return res.status(500).send('Server error');
                 }
-                res.sendFile(path.join(__dirname, '../Client/view/dashboard.html')); 
+            res.status(200).send('Benutzer wurde erstellt.');
             });
         }
     });

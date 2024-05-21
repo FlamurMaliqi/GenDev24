@@ -28,11 +28,7 @@ function validateForm() {
         })
         .then(response => {
             if (response.status === 200) {
-                // Benutzer wurde erfolgreich registriert, verarbeiten Sie die Antwort hier
-                return response.text().then(text => {
-                    // Das Dashboard HTML wird hier geladen
-                    document.body.innerHTML = text;
-                });
+               window.location.href = '/Client/view/dashboard.html'; 
             } else {
                 // Es gab einen Fehler, verarbeiten Sie die Antwort hier
                 alert('Benutzername bereits vergeben');
