@@ -4,54 +4,37 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Community-Seite</title>
+    <title>Community A</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
 
+    <link rel="stylesheet" href="styles/general.css" />
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-        }
-
-        .navbar {
-            background-color: #343a40 !important;
-        }
-
-        .cardbody-color {
-            background-color: #fff;
-        }
-
-        .dashboard-section {
-            border-top: 1px solid #dee2e6;
-            padding-top: 20px;
+        .leaderboard-table {
+            width: 100%;
             margin-top: 20px;
+            border-collapse: collapse;
         }
-
-        .btn-color {
-            background-color: #007bff;
-            color: #fff;
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .leaderboard-table th {
+            background-color: #f2f2f2;
+        }
+        .highlight {
+            background-color: #e6f7ff;
+        }
+        .nav-arrows {
+            text-align: center;
+        }
+        .nav-arrows button {
+            background: none;
             border: none;
-            border-radius: 5px;
+            font-size: 20px;
             cursor: pointer;
-        }
-
-        .btn-color:hover {
-            background-color: #0056b3;
-        }
-
-        .list-unstyled {
-            padding-left: 0;
-            list-style: none;
-        }
-
-        .list-unstyled li {
-            margin-bottom: 10px;
-        }
-
-        .list-unstyled li:last-child {
-            margin-bottom: 0;
         }
     </style>
 </head>
@@ -61,50 +44,132 @@
     <header>
         <nav class="navbar navbar-dark bg-dark">
             <div class="container">
-                <a class="navbar-brand" href="#">GenDev 2024</a>
+                <a class="navbar-brand" href="dashboard.html">GenDev 2024</a>
+                <div class="navbar-nav">
+                    <a class="nav-link" href="global-standings.html">Global Standings</a>
+                    <a class="nav-link" href="communities.html">Communities</a>
+                    <a class="nav-link" href="bet.html">Place Bet</a>
+                    <a class="nav-link" href="login.html">Logout</a>
+                </div>
             </div>
         </nav>
     </header>
 
-    <!-- Community-Seite -->
-    <div class="container">
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <h2 class="text-center text-dark mt-5">Community-Seite</h2>
-                <div class="card my-5">
-                    <div class="card-body cardbody-color p-lg-5">
-                        <h3 class="text-center mb-4">Community XYZ</h3>
-                        <div class="community-info">
-                            <h4>Rangliste der Community</h4>
-                            <ul class="list-unstyled">
-                                <li>1. MaxMustermann (750 Punkte)</li>
-                                <li>2. LisaMusterfrau (600 Punkte)</li>
-                                <li>3. JohnDoe (550 Punkte)</li>
-                                <!-- Weitere Community-Mitglieder hier einfügen -->
-                            </ul>
-                        </div>
-                        <div class="community-info mt-5">
-                            <h4>Spiele der Community</h4>
-                            <ul class="list-unstyled">
-                                <li>Deutschland vs. Frankreich (2:1)</li>
-                                <li>Portugal vs. Spanien (1:1)</li>
-                                <li>Italien vs. England (3:2)</li>
-                                <!-- Weitere Spiele hier einfügen -->
-                            </ul>
-                        </div>
-                        <div class="text-center mt-4">
-                            <a href="#" class="btn btn-color px-5 mb-5">Community beitreten</a>
-                        </div>
-                    </div>
+    <!-- Community Leaderboard -->
+    <div class="container mt-5">
+        <h2 class="text-center text-dark">Community A Leaderboard</h2>
+        <div class="leaderboard">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>+/-</th>
+                        <th>Name</th>
+                        <th colspan="4">Results</th>
+                        <th>P</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <!-- Dummy data for the initial page -->
+                    <tr>
+                        <td>1</td>
+                        <td>+3,112,316</td>
+                        <td>Lukas</td>
+                        <td>1:2</td>
+                        <td>0:2</td>
+                        <td></td>
+                        <td></td>
+                        <td>24</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>+3,112,316</td>
+                        <td>BayernFan</td>
+                        <td>1:2</td>
+                        <td>0:2</td>
+                        <td></td>
+                        <td></td>
+                        <td>24</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>+3,112,316</td>
+                        <td>123987</td>
+                        <td>1:2</td>
+                        <td>0:2</td>
+                        <td></td>
+                        <td></td>
+                        <td>24</td>
+                    </tr>
+                    <tr class="nav-arrows">
+                        <td colspan="8">
+                            <button onclick="loadPreviousPage()">&#9650;</button>
+                        </td>
+                    </tr>
+                    <tr class="nav-arrows">
+                        <td colspan="8">
+                            <button onclick="loadNextPage()">&#9660;</button>
+                        </td>
+                    </tr>
+                    <tr class="highlight">
+                        <td>1,111,924</td>
+                        <td>+2,000,393</td>
+                        <td>Henner</td>
+                        <td>0:1</td>
+                        <td>2:2</td>
+                        <td>4:0</td>
+                        <td></td>
+                        <td>6</td>
+                    </tr>
+                    <tr>
+                        <td>1,111,989</td>
+                        <td>+2,000,328</td>
+                        <td>Jvh</td>
+                        <td>1:0</td>
+                        <td>0:0</td>
+                        <td></td>
+                        <td></td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>1,111,989</td>
+                        <td>+2,000,328</td>
+                        <td>Charly</td>
+                        <td>3:1</td>
+                        <td>1:1</td>
+                        <td></td>
+                        <td></td>
+                        <td>4</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3 class="mt-4">Search User</h3>
+            <form>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="searchUser" placeholder="Enter username" />
                 </div>
-            </div>
+                <button type="button" class="btn btn-dark btn-block" onclick="searchUser()">Search</button>
+            </form>
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function searchUser() {
+            var username = document.getElementById("searchUser").value;
+            alert("Searching for user: " + username);
+            // Add the logic to search for the user within the community leaderboard
+        }
+
+        function loadPreviousPage() {
+            alert("Loading previous page of users...");
+            // Add the logic to load the previous page of users in the leaderboard
+        }
+
+        function loadNextPage() {
+            alert("Loading next page of users...");
+            // Add the logic to load the next page of users in the leaderboard
+        }
+    </script>
 </body>
 
 </html>
