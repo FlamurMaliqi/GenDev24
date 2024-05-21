@@ -18,7 +18,7 @@
         <nav class="navbar navbar-dark bg-dark">
             <div class="container">
                 <a class="navbar-brand" href="dashboard.html">GenDev 2024</a>
-                <div class="navbar-nav">
+                <div class="navbar-nav ml-auto">
                     <a class="nav-link" href="global-standings.html">Global Standings</a>
                     <a class="nav-link" href="communities.html">Communities</a>
                     <a class="nav-link" href="bet.html">Place Bet</a>
@@ -34,16 +34,14 @@
         <div class="row">
             <div class="col-md-8 offset-md-2">
                 <h3>Your Communities</h3>
-                <ul class="list-group">
-                    <li class="list-group-item"><a href="community.html">Community A</a></li>
-                    <li class="list-group-item"><a href="community.html">Community B</a></li>
-                    <li class="list-group-item"><a href="community.html">Community C</a></li>
-                    <!-- Add more communities as needed -->
+                <ul class="list-group" id="community-list">
+                    <!-- Communities will be loaded here -->
                 </ul>
                 <a href="create-community.html" class="btn btn-dark btn-block mt-4">Create New Community</a>
             </div>
         </div>
     </div>
+    <script src="../control/communities.js"></script>
 </body>
 
 </html>

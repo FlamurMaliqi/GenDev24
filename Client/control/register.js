@@ -7,7 +7,7 @@ function validateForm() {
         return true;
     }
 
-    function submitForm(event) {
+function submitForm(event) {
         event.preventDefault(); // Verhindert das Neuladen der Seite
 
         if (!validateForm()) {

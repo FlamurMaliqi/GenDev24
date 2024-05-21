@@ -31,6 +31,7 @@
             margin-top: 20px;
         }
     </style>
+
 </head>
 
 <body>
@@ -39,7 +40,7 @@
         <nav class="navbar navbar-dark bg-dark">
             <div class="container">
                 <a class="navbar-brand" href="dashboard.html">GenDev 2024</a>
-                <div class="navbar-nav">
+                <div class="navbar-nav ml-auto">
                     <a class="nav-link" href="global-standings.html">Global Standings</a>
                     <a class="nav-link" href="communities.html">Communities</a>
                     <a class="nav-link" href="bet.html">Place Bet</a>
@@ -112,11 +113,8 @@
 
         <!-- Upcoming Games -->
         <h3 class="mt-4">Upcoming Games</h3>
-        <ul class="list-group">
-            <li class="list-group-item">Deutschland vs. Schottland - 24.06.2024</li>
-            <li class="list-group-item">Frankreich vs. Italien - 25.06.2024</li>
-            <li class="list-group-item">Spanien vs. Portugal - 26.06.2024</li>
-            <!-- Add more dummy data as needed -->
+        <ul class="list-group" id="upcoming-games">
+            <!-- Upcoming games will be loaded here -->
         </ul>
 
         <!-- Community Leaderboard Preview -->
@@ -241,15 +239,5 @@
                         <td>0:0</td>
                         <td>4</td>
                     </tr>
-                    <tr>
-                        <td>1,111,989</td>
-                        <td>+2,000,328</td>
-                        <td>Charly</td>
-                        <td>3:1</td>
-                        <td>1:1</td>
-                        <td>4</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-   
+                   
+    <script src="../control/dashboard.js"></script>
