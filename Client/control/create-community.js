@@ -28,12 +28,17 @@ function submitForm(event) {
             'userId': userId
         }),
     })
-    .then(response => {
-        if (response.status === 200) {
+    .then(response => response.json().then(data => ({ status: response.status, body: data })))
+    .then(({ status, body }) => {
+        if (status === 200) {
+            alert(body.message)
             window.location.href = '/Client/view/communities.html';
+        } else if (status === 400) {
+            // Handle error response when community already exists
+            alert(body.message);
         } else {
-            // Handle error response
-            alert('Error creating community');
+            // Handle other error responses
+            alert('Error creating community: ' + body.message);
         }
     })
     .catch(error => console.error('Error:', error));

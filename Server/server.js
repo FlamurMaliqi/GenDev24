@@ -70,18 +70,30 @@ app.post('/create-community', (req, res) => {
     const communityName = req.body.communityName;
     const userId = req.body.userId;
 
-    db.run('INSERT INTO communities (name, user_id) VALUES (?, ?)', [communityName, userId], function(err) {
+    // Überprüfen, ob die Community bereits existiert
+    db.get('SELECT * FROM communities WHERE name = ?', [communityName], (err, row) => {
         if (err) {
-            return console.error(err.message);
+            console.error(err.message);
+            return res.status(500).json({ message: 'Server error' });
         }
-        const communityId = this.lastID;
-        db.run('INSERT INTO user_communities (user_id, community_id) VALUES (?, ?)', [userId, communityId], (err) => {
-            if (err) {
-                console.error(err.message);
-                return res.status(500).send('Server error');
-            }
-            res.status(200).send('Community erstellt');
-        });
+        if (row) {
+            return res.status(400).json({ message: 'Community already exists' });
+        } else {
+            // Community existiert nicht, füge sie hinzu
+            db.run('INSERT INTO communities (name, user_id) VALUES (?, ?)', [communityName, userId], function(err) {
+                if (err) {
+                    return console.error(err.message);
+                }
+                const communityId = this.lastID;
+                db.run('INSERT INTO user_communities (user_id, community_id) VALUES (?, ?)', [userId, communityId], (err) => {
+                    if (err) {
+                        console.error(err.message);
+                        return res.status(500).send('Server error');
+                    }
+                    res.status(200).json({message: 'Community erstellt'});
+                });
+            });
+        }
     });
 });
 
