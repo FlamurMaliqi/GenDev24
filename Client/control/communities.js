@@ -13,9 +13,11 @@ document.addEventListener('DOMContentLoaded', function() {
             communityList.innerHTML = '';
 
             communities.forEach(community => {
-                var listItem = document.createElement('li');
-                listItem.textContent = community.name;
-                communityList.appendChild(listItem);
+                var link = document.createElement('a');
+                link.href = `community.html?communityId=${community.id}`;
+                link.textContent = community.name;
+                link.className = 'list-group-item';
+                communityList.appendChild(link);
             });
         })
         .catch(error => console.error('Error fetching communities:', error));
