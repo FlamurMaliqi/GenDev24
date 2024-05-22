@@ -8,6 +8,7 @@ const cors = require('cors');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json()); // Wichtig für JSON POST requests
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -55,7 +56,7 @@ app.post('/register-user', (req, res) => {
 app.get('/api/user-communities', (req, res) => {
     const userId = req.query.userId;
 
-    db.all('SELECT * FROM communities WHERE user_id = ?', [userId], (err, rows) => {
+    db.all('SELECT * FROM communities WHERE id IN (SELECT community_id FROM user_communities WHERE user_id = ?)', [userId], (err, rows) => {
         if (err) {
             console.error(err.message);
             return res.status(500).send('Server error');
@@ -69,11 +70,18 @@ app.post('/create-community', (req, res) => {
     const communityName = req.body.communityName;
     const userId = req.body.userId;
 
-    db.run('INSERT INTO communities (name, user_id) VALUES (?, ?)', [communityName, userId], (err) => {
+    db.run('INSERT INTO communities (name, user_id) VALUES (?, ?)', [communityName, userId], function(err) {
         if (err) {
             return console.error(err.message);
         }
-        res.status(200).send('Community erstellt');
+        const communityId = this.lastID;
+        db.run('INSERT INTO user_communities (user_id, community_id) VALUES (?, ?)', [userId, communityId], (err) => {
+            if (err) {
+                console.error(err.message);
+                return res.status(500).send('Server error');
+            }
+            res.status(200).send('Community erstellt');
+        });
     });
 });
 
@@ -98,6 +106,31 @@ app.get('/api/upcoming-games', (req, res) => {
             console.error(err);
             res.status(500).send('Server error');
         });
+});
+
+// Endpoint zum Beitreten einer Community
+app.post('/join-community', (req, res) => {
+    const communityName = req.body.communityName;
+    const userId = req.body.userId;
+
+    db.get('SELECT id FROM communities WHERE name = ?', [communityName], (err, row) => {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).json({ message: 'Server error' });
+        }
+        if (row) {
+            const communityId = row.id;
+            db.run('INSERT INTO user_communities (user_id, community_id) VALUES (?, ?)', [userId, communityId], (err) => {
+                if (err) {
+                    console.error(err.message);
+                    return res.status(500).json({ message: 'Server error' });
+                }
+                res.status(200).json({ message: 'Successfully joined the community' });
+            });
+        } else {
+            res.status(404).json({ message: 'Community not found: ' + communityName });
+        }
+    });
 });
 
 app.listen(3000, () => {

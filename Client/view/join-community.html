@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Communities</title>
+    <title>Join Community</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
@@ -19,6 +19,7 @@
             <div class="container">
                 <a class="navbar-brand" href="dashboard.html">GenDev 2024</a>
                 <div class="navbar-nav ml-auto">
+                    <a class="nav-link" href="dashboard.html">Dashboard</a>
                     <a class="nav-link" href="global-standings.html">Global Standings</a>
                     <a class="nav-link" href="communities.html">Communities</a>
                     <a class="nav-link" href="bet.html">Place Bet</a>
@@ -28,22 +29,22 @@
         </nav>
     </header>
 
-    <!-- Communities -->
+    <!-- Join Community -->
     <div class="container mt-5">
-        <h2 class="text-center text-dark">Communities</h2>
+        <h2 class="text-center text-dark">Join Community</h2>
         <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <h3>Your Communities</h3>
-                <ul class="list-group" id="community-list">
-                    <!-- Communities will be loaded here -->
-                </ul>
-                <a href="create-community.html" class="btn btn-dark btn-block mt-4">Create New Community</a>
-                <a href="join-community.html" class="btn btn-dark btn-block mt-2">Join Community</a>
+            <div class="col-md-6 offset-md-3">
+                <form onsubmit="submitJoinForm(event)">
+                    <div class="form-group">
+                        <label for="communityName">Community Name:</label>
+                        <input type="text" class="form-control" id="communityName" name="communityName" placeholder="Enter community name" required />
+                    </div>
+                    <button type="submit" class="btn btn-dark btn-block">Join Community</button>
+                </form>
             </div>
         </div>
     </div>
-    <script src="../control/communities.js"></script>
-
+    <script src="../control/join-community.js"></script>
 </body>
 
 </html>
