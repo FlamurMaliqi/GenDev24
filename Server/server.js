@@ -97,6 +97,20 @@ app.post('/create-community', (req, res) => {
     });
 });
 
+// Endpoint zum Abrufen des Community-Leaderboards
+app.get('/api/community-leaderboard', (req, res) => {
+    const communityId = req.query.communityId;
+
+    db.all('SELECT * FROM leaderboard WHERE community_id = ?', [communityId], (err, rows) => {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).json({ message: 'Server error' });
+        }
+        res.json(rows);
+    });
+});
+
+
 // Endpoint zum Abrufen der bevorstehenden Spiele
 app.get('/api/upcoming-games', (req, res) => {
     const games = [];

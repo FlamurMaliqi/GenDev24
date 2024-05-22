@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 var link = document.createElement('a');
                 link.href = `community.html?communityId=${community.id}`;
                 link.textContent = community.name;
-                link.className = 'list-group-item';
+                link.className = 'list-group-item list-group-item-action';
                 communityList.appendChild(link);
             });
         })
