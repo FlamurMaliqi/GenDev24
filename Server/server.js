@@ -51,14 +51,29 @@ app.post('/register-user', (req, res) => {
     });
 });
 
-// Endpoint zum Abrufen aller Communities
-app.get('/api/communities', (req, res) => {
-    db.all('SELECT * FROM communities', [], (err, rows) => {
+// Endpoint zum Abrufen der Communities für einen bestimmten Benutzer
+app.get('/api/user-communities', (req, res) => {
+    const userId = req.query.userId;
+
+    db.all('SELECT * FROM communities WHERE user_id = ?', [userId], (err, rows) => {
         if (err) {
             console.error(err.message);
             return res.status(500).send('Server error');
         }
         res.json(rows);
+    });
+});
+
+// Endpoint zum Erstellen einer neuen Community
+app.post('/create-community', (req, res) => {
+    const communityName = req.body.communityName;
+    const userId = req.body.userId;
+
+    db.run('INSERT INTO communities (name, user_id) VALUES (?, ?)', [communityName, userId], (err) => {
+        if (err) {
+            return console.error(err.message);
+        }
+        res.status(200).send('Community erstellt');
     });
 });
 
@@ -83,18 +98,6 @@ app.get('/api/upcoming-games', (req, res) => {
             console.error(err);
             res.status(500).send('Server error');
         });
-});
-
-// Endpoint zum Erstellen einer neuen Community
-app.post('/create-community', (req, res) => {
-    const communityName = req.body.communityName;
-
-    db.run('INSERT INTO communities (name) VALUES (?)', [communityName], (err) => {
-        if (err) {
-            return console.error(err.message);
-        }
-        res.status(200).send('Community erstellt');
-    });
 });
 
 app.listen(3000, () => {
