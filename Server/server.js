@@ -108,7 +108,6 @@ app.get('/api/upcoming-games', (req, res) => {
         });
 });
 
-// Endpoint zum Beitreten einer Community
 app.post('/join-community', (req, res) => {
     const communityName = req.body.communityName;
     const userId = req.body.userId;
@@ -120,12 +119,24 @@ app.post('/join-community', (req, res) => {
         }
         if (row) {
             const communityId = row.id;
-            db.run('INSERT INTO user_communities (user_id, community_id) VALUES (?, ?)', [userId, communityId], (err) => {
+
+            // Überprüfen, ob der Benutzer bereits in der Community ist
+            db.get('SELECT * FROM user_communities WHERE user_id = ? AND community_id = ?', [userId, communityId], (err, userCommunityRow) => {
                 if (err) {
                     console.error(err.message);
                     return res.status(500).json({ message: 'Server error' });
                 }
-                res.status(200).json({ message: 'Successfully joined the community' });
+                if (userCommunityRow) {
+                    return res.status(400).json({ message: 'User is already a member of the community' });
+                } else {
+                    db.run('INSERT INTO user_communities (user_id, community_id) VALUES (?, ?)', [userId, communityId], (err) => {
+                        if (err) {
+                            console.error(err.message);
+                            return res.status(500).json({ message: 'Server error' });
+                        }
+                        res.status(200).json({ message: 'Successfully joined the community' });
+                    });
+                }
             });
         } else {
             res.status(404).json({ message: 'Community not found: ' + communityName });
