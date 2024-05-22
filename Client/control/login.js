@@ -27,13 +27,24 @@ function submitForm(event) {
         }),
     })
     .then(response => {
-        if (response.status === 200) {
-            // Benutzer wurde erfolgreich überprüft, auf dashboard.html weiterleiten
+        if (!response.ok) {
+            return response.json().then(err => { throw err });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.userId) {
+            console.log('User ID:', data.userId);
+            // Store userId in local storage
+            localStorage.setItem('userId', data.userId);
+            // Redirect to dashboard
             window.location.href = '/Client/view/dashboard.html';
         } else {
-            // Es gab einen Fehler, verarbeiten Sie die Antwort hier
             alert('Benutzername existiert nicht');
         }
     })
-    .catch(error => console.error('Fehler:', error));
+    .catch(error => {
+        console.error('Fehler:', error);
+        alert(error.message || 'Unbekannter Fehler');
+    });
 }

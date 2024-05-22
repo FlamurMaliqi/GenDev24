@@ -21,9 +21,9 @@ app.post('/check-user', (req, res) => {
             return res.status(500).send('Server error');
         }
         if (row) {
-            res.status(200).send('Benutzer ist eingeloggt.');
+            res.status(200).json({ message: 'Benutzer ist eingeloggt.', userId: row.id });
         } else {
-            res.status(404).send('Benutzer existiert nicht.');
+            res.status(404).json({ message: 'Benutzer existiert nicht.' });
         }
     });
 });
@@ -38,14 +38,14 @@ app.post('/register-user', (req, res) => {
             return res.status(500).send('Server error');
         }
         if (row) {
-            res.status(403).send('Benutzer existiert bereits.');
+            res.status(403).json({ message: 'Benutzer existiert bereits.' });
         } else {
-            db.run('INSERT INTO users (username) VALUES (?)', [username], (err) => {
+            db.run('INSERT INTO users (username) VALUES (?)', [username], function(err) {
                 if (err) {
                     console.error(err.message);
                     return res.status(500).send('Server error');
                 }
-            res.status(200).send('Benutzer wurde erstellt.');
+                res.status(200).json({ message: 'Benutzer wurde erstellt.', userId: this.lastID });
             });
         }
     });
@@ -61,7 +61,6 @@ app.get('/api/communities', (req, res) => {
         res.json(rows);
     });
 });
-
 
 // Endpoint zum Abrufen der bevorstehenden Spiele
 app.get('/api/upcoming-games', (req, res) => {
@@ -86,6 +85,7 @@ app.get('/api/upcoming-games', (req, res) => {
         });
 });
 
+// Endpoint zum Erstellen einer neuen Community
 app.post('/create-community', (req, res) => {
     const communityName = req.body.communityName;
 
