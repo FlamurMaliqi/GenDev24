@@ -16,44 +16,17 @@ function submitJoinForm(event) {
         },
         body: new URLSearchParams({ 'communityName': communityName, 'userId': userId })
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            window.location.href = '/Client/view/dashboard.html';
+    .then(response => {
+        if (response.status === 200) {
+            return response.json().then(data => {
+                window.location.href = '/Client/view/communities.html';
+                alert(data.message);
+            });
         } else {
-            alert('Error joining the community: ' + data.message);
+            return response.json().then(data => {
+                alert(data.message);
+            });
         }
     })
     .catch(error => console.error('Error:', error));
 }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-                                                                                                                                                                                                                        
