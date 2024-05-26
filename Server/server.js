@@ -65,35 +65,69 @@ app.get('/api/user-communities', (req, res) => {
     });
 });
 
-// Endpoint zum Erstellen einer neuen Community
+// Route zum Erstellen einer Community
 app.post('/create-community', (req, res) => {
-    const communityName = req.body.communityName;
-    const userId = req.body.userId;
+    const { communityName, userId } = req.body;
 
     // Überprüfen, ob die Community bereits existiert
     db.get('SELECT * FROM communities WHERE name = ?', [communityName], (err, row) => {
         if (err) {
-            console.error(err.message);
-            return res.status(500).json({ message: 'Server error' });
+            return res.status(500).json({ message: 'Database error' });
         }
         if (row) {
             return res.status(400).json({ message: 'Community already exists' });
-        } else {
-            // Community existiert nicht, füge sie hinzu
-            db.run('INSERT INTO communities (name, user_id) VALUES (?, ?)', [communityName, userId], function(err) {
+        }
+
+        // Community erstellen
+        db.run('INSERT INTO communities (name, user_id) VALUES (?, ?)', [communityName, userId], function (err) {
+            if (err) {
+                return res.status(500).json({ message: 'Error creating community' });
+            }
+
+            const communityId = this.lastID;
+
+            // Benutzer zur user_communities Tabelle hinzufügen
+            db.run('INSERT INTO user_communities (user_id, community_id) VALUES (?, ?)', [userId, communityId], function (err) {
                 if (err) {
-                    return console.error(err.message);
+                    return res.status(500).json({ message: 'Error adding user to community' });
                 }
-                const communityId = this.lastID;
-                db.run('INSERT INTO user_communities (user_id, community_id) VALUES (?, ?)', [userId, communityId], (err) => {
+
+                // Werte in der Leaderboard-Tabelle initialisieren
+                const leaderboardEntries = [
+                    { community_id: communityId, user_id: userId, position: 0, change: '0', name: '', result1: '0', result2: '0', result3: '0', result4: '0', points: 0 }
+                ];
+
+                const placeholders = leaderboardEntries.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(',');
+                const values = leaderboardEntries.flatMap(entry => [
+                    entry.community_id, entry.user_id, entry.position, entry.change, entry.name,
+                    entry.result1, entry.result2, entry.result3, entry.result4, entry.points
+                ]);
+
+                db.run(`INSERT INTO leaderboard (community_id, user_id, position, change, name, result1, result2, result3, result4, points) VALUES ${placeholders}`, values, function (err) {
                     if (err) {
-                        console.error(err.message);
-                        return res.status(500).send('Server error');
+                        return res.status(500).json({ message: 'Error initializing leaderboard' });
                     }
-                    res.status(200).json({message: 'Community erstellt'});
+
+                    res.status(200).json({ message: 'Community created successfully' });
                 });
             });
+        });
+    });
+});
+
+// Endpoint zum Abrufen der Community-Details
+app.get('/api/community', (req, res) => {
+    const communityId = req.query.communityId;
+
+    db.get('SELECT * FROM communities WHERE id = ?', [communityId], (err, row) => {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).json({ message: 'Server error' });
         }
+        if (!row) {
+            return res.status(404).json({ message: 'Community not found' });
+        }
+        res.json(row);
     });
 });
 
@@ -109,7 +143,6 @@ app.get('/api/community-leaderboard', (req, res) => {
         res.json(rows);
     });
 });
-
 
 // Endpoint zum Abrufen der bevorstehenden Spiele
 app.get('/api/upcoming-games', (req, res) => {
