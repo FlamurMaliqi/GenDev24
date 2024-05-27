@@ -117,8 +117,25 @@ app.get('/api/community', (req, res) => {
 // Endpoint zum Abrufen des Community-Leaderboards
 app.get('/api/community-leaderboard', (req, res) => {
     const communityId = req.query.communityId;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
 
-    db.all('SELECT u.username, u.current_points, u.current_rank FROM user_communities uc JOIN users u ON uc.user_id = u.id WHERE uc.community_id = ?', [communityId], (err, rows) => {
+    db.all('SELECT u.username, u.current_points, u.current_rank FROM user_communities uc JOIN users u ON uc.user_id = u.id WHERE uc.community_id = ? ORDER BY u.current_rank LIMIT ? OFFSET ?', [communityId, limit, offset], (err, rows) => {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).json({ message: 'Server error' });
+        }
+        res.json(rows);
+    });
+});
+
+// Endpoint zum Suchen von Benutzern im Leaderboard
+app.get('/api/search-user', (req, res) => {
+    const communityId = req.query.communityId;
+    const username = req.query.username;
+
+    db.all('SELECT u.username, u.current_points, u.current_rank FROM user_communities uc JOIN users u ON uc.user_id = u.id WHERE uc.community_id = ? AND u.username LIKE ?', [communityId, `%${username}%`], (err, rows) => {
         if (err) {
             console.error(err.message);
             return res.status(500).json({ message: 'Server error' });
@@ -143,6 +160,39 @@ app.get('/api/upcoming-games', (req, res) => {
                 .sort((a, b) => new Date(a.game_starts_at) - new Date(b.game_starts_at))
                 .slice(0, 3);
             res.json(upcomingGames);
+        })
+        .on('error', (err) => {
+            console.error(err);
+            res.status(500).send('Server error');
+        });
+});
+
+// Endpoint zum Abrufen der nächsten drei Spiele
+app.get('/api/next-three-games', (req, res) => {
+    const games = [];
+    const csvFilePath = path.join(__dirname, 'game_schedule.csv');
+
+    fs.createReadStream(csvFilePath)
+        .pipe(csv({ separator: ';' }))
+        .on('data', (row) => {
+            games.push(row);
+        })
+        .on('end', () => {
+            const now = new Date();
+            const nextThreeGames = games
+                .map(game => {
+                    game.game_starts_at = new Date(game.game_starts_at);
+                    return game;
+                })
+                .filter(game => game.game_starts_at > now)
+                .sort((a, b) => a.game_starts_at - b.game_starts_at)
+                .slice(0, 3);
+                
+            if (nextThreeGames.length > 0) {
+                res.json(nextThreeGames);
+            } else {
+                res.status(404).json({ message: 'No upcoming games found' });
+            }
         })
         .on('error', (err) => {
             console.error(err);
@@ -185,39 +235,6 @@ app.post('/join-community', (req, res) => {
             res.status(404).json({ message: 'Community not found: ' + communityName });
         }
     });
-});
-
-// Endpoint zum Abrufen der nächsten drei Spiele
-app.get('/api/next-three-games', (req, res) => {
-    const games = [];
-    const csvFilePath = path.join(__dirname, 'game_schedule.csv');
-
-    fs.createReadStream(csvFilePath)
-        .pipe(csv({ separator: ';' }))
-        .on('data', (row) => {
-            games.push(row);
-        })
-        .on('end', () => {
-            const now = new Date();
-            const nextThreeGames = games
-                .map(game => {
-                    game.game_starts_at = new Date(game.game_starts_at);
-                    return game;
-                })
-                .filter(game => game.game_starts_at > now)
-                .sort((a, b) => a.game_starts_at - b.game_starts_at)
-                .slice(0, 3);
-                
-            if (nextThreeGames.length > 0) {
-                res.json(nextThreeGames);
-            } else {
-                res.status(404).json({ message: 'No upcoming games found' });
-            }
-        })
-        .on('error', (err) => {
-            console.error(err);
-            res.status(500).send('Server error');
-        });
 });
 
 app.listen(3000, () => {
