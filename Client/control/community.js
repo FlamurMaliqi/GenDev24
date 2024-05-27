@@ -26,14 +26,9 @@ function loadLeaderboard(communityId) {
             data.forEach((entry, index) => {
                 var row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${entry.change}</td>
-                    <td>${entry.name}</td>
-                    <td>${entry.result1}</td>
-                    <td>${entry.result2}</td>
-                    <td>${entry.result3}</td>
-                    <td>${entry.result4}</td>
-                    <td>${entry.points}</td>
+                    <td>${entry.current_rank}</td>
+                    <td>${entry.username}</td>
+                    <td>${entry.current_points}</td>
                 `;
                 leaderboardBody.appendChild(row);
             });

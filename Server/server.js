@@ -41,7 +41,7 @@ app.post('/register-user', (req, res) => {
         if (row) {
             res.status(403).json({ message: 'Benutzer existiert bereits.' });
         } else {
-            db.run('INSERT INTO users (username) VALUES (?)', [username], function(err) {
+            db.run('INSERT INTO users (username, current_points, current_rank) VALUES (?, 0, 0)', [username], function(err) {
                 if (err) {
                     console.error(err.message);
                     return res.status(500).send('Server error');
@@ -92,24 +92,7 @@ app.post('/create-community', (req, res) => {
                     return res.status(500).json({ message: 'Error adding user to community' });
                 }
 
-                // Werte in der Leaderboard-Tabelle initialisieren
-                const leaderboardEntries = [
-                    { community_id: communityId, user_id: userId, position: 0, change: '0', name: '', result1: '0', result2: '0', result3: '0', result4: '0', points: 0 }
-                ];
-
-                const placeholders = leaderboardEntries.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(',');
-                const values = leaderboardEntries.flatMap(entry => [
-                    entry.community_id, entry.user_id, entry.position, entry.change, entry.name,
-                    entry.result1, entry.result2, entry.result3, entry.result4, entry.points
-                ]);
-
-                db.run(`INSERT INTO leaderboard (community_id, user_id, position, change, name, result1, result2, result3, result4, points) VALUES ${placeholders}`, values, function (err) {
-                    if (err) {
-                        return res.status(500).json({ message: 'Error initializing leaderboard' });
-                    }
-
-                    res.status(200).json({ message: 'Community created successfully' });
-                });
+                res.status(200).json({ message: 'Community created successfully' });
             });
         });
     });
@@ -135,7 +118,7 @@ app.get('/api/community', (req, res) => {
 app.get('/api/community-leaderboard', (req, res) => {
     const communityId = req.query.communityId;
 
-    db.all('SELECT * FROM leaderboard WHERE community_id = ?', [communityId], (err, rows) => {
+    db.all('SELECT u.username, u.current_points, u.current_rank FROM user_communities uc JOIN users u ON uc.user_id = u.id WHERE uc.community_id = ?', [communityId], (err, rows) => {
         if (err) {
             console.error(err.message);
             return res.status(500).json({ message: 'Server error' });
@@ -193,6 +176,7 @@ app.post('/join-community', (req, res) => {
                             console.error(err.message);
                             return res.status(500).json({ message: 'Server error' });
                         }
+
                         res.status(200).json({ message: 'Successfully joined the community' });
                     });
                 }
