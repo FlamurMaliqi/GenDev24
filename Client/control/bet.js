@@ -1,3 +1,5 @@
+let selectedGame = null; // Variable to store the selected game
+
 document.addEventListener('DOMContentLoaded', function() {
     fetch('http://localhost:3000/api/next-three-games')
         .then(response => response.json())
@@ -6,17 +8,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
             games.forEach((game, index) => {
                 const option = document.createElement('option');
-                option.value = index;
-                option.textContent = `${game.team_home_name} vs ${game.team_away_name} (${new Date(game.game_starts_at).toLocaleString()})`;
+                option.value = game.game_starts_at;
+                const gameDate = new Date(game.game_starts_at);
+                option.textContent = `${game.team_home_name} vs ${game.team_away_name} (${gameDate.toLocaleString()})`;
                 gameSelect.appendChild(option);
             });
 
             if (games.length > 0) {
-                updateTeams(games[0]);
+                selectedGame = games[0];
+                updateTeams(selectedGame);
             }
 
             gameSelect.addEventListener('change', function() {
-                const selectedGame = games[this.value];
+                selectedGame = games.find(game => game.game_starts_at === this.value);
                 updateTeams(selectedGame);
             });
         })
@@ -24,23 +28,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('bet-form').addEventListener('submit', function(event) {
         event.preventDefault();
-        placeBet();
+        placeBet(selectedGame); // Pass the selected game to the placeBet function
     });
 });
 
 function updateTeams(game) {
     document.getElementById('homeTeam').value = game.team_home_name;
     document.getElementById('awayTeam').value = game.team_away_name;
-    document.getElementById('homeScore').dataset.gameId = game.id; // Save gameId in dataset for later use
-    document.getElementById('awayScore').dataset.gameId = game.id; // Save gameId in dataset for later use
 }
 
-function placeBet() {
+function placeBet(game) {
+    if (!game) {
+        alert('No game selected');
+        return;
+    }
+
     const userId = localStorage.getItem('userId'); // Assuming userId is stored in localStorage
-    const gameId = document.getElementById('homeScore').dataset.gameId;
+    const gameStartsAt = game.game_starts_at; // Use game_starts_at from the game object
+    const homeTeam = game.team_home_name;
+    const awayTeam = game.team_away_name;
     const homeScore = document.getElementById('homeScore').value;
     const awayScore = document.getElementById('awayScore').value;
-    console.log(gameId);
 
     fetch('http://localhost:3000/api/place-bet', {
         method: 'POST',
@@ -49,7 +57,9 @@ function placeBet() {
         },
         body: JSON.stringify({
             userId: userId,
-            gameId: gameId,
+            gameStartsAt: gameStartsAt,
+            homeTeam: homeTeam,
+            awayTeam: awayTeam,
             homeScore: homeScore,
             awayScore: awayScore
         }),

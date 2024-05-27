@@ -237,28 +237,34 @@ app.post('/join-community', (req, res) => {
     });
 });
 
-// Endpoint zum Platzieren einer Wette
+// Endpoint zum Platzieren einer Wette basierend auf game_starts_at
 app.post('/api/place-bet', (req, res) => {
-    const { userId, gameId, homeScore, awayScore } = req.body;
+    const { userId, gameStartsAt, homeScore, awayScore } = req.body;
 
-    db.get('SELECT game_starts_at FROM games WHERE id = ?', [gameId], (err, game) => {
+    // Extrahiere nur das Datum
+    const gameStartsAtDate = new Date(gameStartsAt).toISOString().split('T')[0];
+    console.log(gameStartsAtDate);
+    console.log(req.body.homeTeam);
+    console.log(req.body.awayTeam);
+
+    db.get('SELECT * FROM games WHERE DATE(game_starts_at) = ? AND team_home_name = ? AND team_away_name = ?', [gameStartsAtDate, req.body.homeTeam, req.body.awayTeam], (err, game) => {
         if (err) {
             console.error(err.message);
-            return res.status(500).send('Server error');
+            return res.status(500).json({ message: 'Server error' });
         }
 
         if (!game) {
-            return res.status(404).json({message: 'Game not found'});
+            return res.status(404).json({ message: 'Game not found' });
         }
 
-        const gameStartsAt = new Date(game.game_starts_at);
+        const gameStartsAtDateTime = new Date(game.game_starts_at);
         const now = new Date();
 
-        if (now >= gameStartsAt) {
+        if (now >= gameStartsAtDateTime) {
             return res.status(400).json({ message: 'Betting for this game is closed' });
         }
 
-        db.run('INSERT INTO bets (user_id, game_id, home_score, away_score) VALUES (?, ?, ?, ?)', [userId, gameId, homeScore, awayScore], function(err) {
+        db.run('INSERT INTO bets (user_id, game_id, home_score, away_score) VALUES (?, ?, ?, ?)', [userId, game.id, homeScore, awayScore], function(err) {
             if (err) {
                 console.error(err.message);
                 return res.status(500).json({ message: 'Error placing bet' });
