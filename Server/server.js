@@ -237,6 +237,94 @@ app.post('/join-community', (req, res) => {
     });
 });
 
+// Endpoint zum Platzieren einer Wette
+app.post('/api/place-bet', (req, res) => {
+    const { userId, gameId, homeScore, awayScore } = req.body;
+
+    db.get('SELECT game_starts_at FROM games WHERE id = ?', [gameId], (err, game) => {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).send('Server error');
+        }
+
+        if (!game) {
+            return res.status(404).json({message: 'Game not found'});
+        }
+
+        const gameStartsAt = new Date(game.game_starts_at);
+        const now = new Date();
+
+        if (now >= gameStartsAt) {
+            return res.status(400).json({ message: 'Betting for this game is closed' });
+        }
+
+        db.run('INSERT INTO bets (user_id, game_id, home_score, away_score) VALUES (?, ?, ?, ?)', [userId, gameId, homeScore, awayScore], function(err) {
+            if (err) {
+                console.error(err.message);
+                return res.status(500).json({ message: 'Error placing bet' });
+            }
+            res.status(200).json({ message: 'Bet placed successfully' });
+        });
+    });
+});
+
+// Endpoint zum Aktualisieren der Spielergebnisse und Berechnen der Punkte
+app.post('/api/update-game-result', (req, res) => {
+    const { gameId, homeScore, awayScore } = req.body;
+
+    db.run('UPDATE games SET home_score = ?, away_score = ? WHERE id = ?', [homeScore, awayScore, gameId], function(err) {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).json({ message: 'Error updating game result' });
+        }
+
+        // Punkte berechnen und aktualisieren
+        db.all('SELECT * FROM bets WHERE game_id = ?', [gameId], (err, bets) => {
+            if (err) {
+                console.error(err.message);
+                return res.status(500).json({ message: 'Error retrieving bets' });
+            }
+
+            bets.forEach(bet => {
+                const points = calculatePoints(homeScore, awayScore, bet.home_score, bet.away_score);
+
+                db.run('UPDATE users SET current_points = current_points + ? WHERE id = ?', [points, bet.user_id], function(err) {
+                    if (err) {
+                        console.error(err.message);
+                    }
+                });
+            });
+
+            res.status(200).json({ message: 'Game result updated and points calculated' });
+        });
+    });
+});
+
+// Funktion zum Berechnen der Punkte basierend auf den Wettregeln
+function calculatePoints(actualHomeScore, actualAwayScore, betHomeScore, betAwayScore) {
+    if (actualHomeScore === betHomeScore && actualAwayScore === betAwayScore) {
+        return 8; // Exact result
+    }
+
+    const actualGoalDifference = actualHomeScore - actualAwayScore;
+    const betGoalDifference = betHomeScore - betAwayScore;
+
+    if (actualGoalDifference === betGoalDifference && actualGoalDifference !== 0) {
+        return 6; // Correct goal difference (non-draw)
+    }
+
+    if (actualGoalDifference === 0 && betGoalDifference === 0) {
+        return 4; // Correct goal difference (draw)
+    }
+
+    if ((actualHomeScore > actualAwayScore && betHomeScore > betAwayScore) ||
+        (actualHomeScore < actualAwayScore && betHomeScore < betAwayScore)) {
+        return 4; // Correct tendency
+    }
+
+    return 0; // Everything else
+}
+
 app.listen(3000, () => {
     console.log('Server läuft auf http://localhost:3000');
 });
