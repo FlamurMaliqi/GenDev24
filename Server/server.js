@@ -187,6 +187,39 @@ app.post('/join-community', (req, res) => {
     });
 });
 
+// Endpoint zum Abrufen der nächsten drei Spiele
+app.get('/api/next-three-games', (req, res) => {
+    const games = [];
+    const csvFilePath = path.join(__dirname, 'game_schedule.csv');
+
+    fs.createReadStream(csvFilePath)
+        .pipe(csv({ separator: ';' }))
+        .on('data', (row) => {
+            games.push(row);
+        })
+        .on('end', () => {
+            const now = new Date();
+            const nextThreeGames = games
+                .map(game => {
+                    game.game_starts_at = new Date(game.game_starts_at);
+                    return game;
+                })
+                .filter(game => game.game_starts_at > now)
+                .sort((a, b) => a.game_starts_at - b.game_starts_at)
+                .slice(0, 3);
+                
+            if (nextThreeGames.length > 0) {
+                res.json(nextThreeGames);
+            } else {
+                res.status(404).json({ message: 'No upcoming games found' });
+            }
+        })
+        .on('error', (err) => {
+            console.error(err);
+            res.status(500).send('Server error');
+        });
+});
+
 app.listen(3000, () => {
     console.log('Server läuft auf http://localhost:3000');
 });
