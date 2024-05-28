@@ -1,4 +1,6 @@
 # Ordner
 control/node_modules
+Server/node_modules
 control/package-lock.json
 control/package.json
+Server/database.db
