@@ -16,17 +16,16 @@ function submitJoinForm(event) {
         },
         body: new URLSearchParams({ 'communityName': communityName, 'userId': userId })
     })
-    .then(response => {
-        if (response.status === 200) {
-            return response.json().then(data => {
-                window.location.href = '/Client/view/communities.html';
-                alert(data.message);
-            });
+    .then(response => response.json().then(data => ({ status: response.status, body: data })))
+    .then(({ status, body }) => {
+        if (status === 200) {
+            window.location.href = '/Client/view/communities.html';
+            alert(body.message);
         } else {
-            return response.json().then(data => {
-                alert(data.message);
-            });
+            alert(body.message);
         }
     })
     .catch(error => console.error('Error:', error));
 }
+
+document.getElementById('joinCommunityForm').addEventListener('submit', submitJoinForm);

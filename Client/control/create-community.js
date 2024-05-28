@@ -34,7 +34,7 @@ function submitForm(event) {
             alert(body.message)
             window.location.href = '/Client/view/communities.html';
         } else if (status === 400) {
-            // Handle error response when community already exists
+            // Handle error response
             alert(body.message);
         } else {
             // Handle other error responses

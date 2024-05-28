@@ -70,30 +70,40 @@ app.get('/api/user-communities', (req, res) => {
 app.post('/create-community', (req, res) => {
     const { communityName, userId } = req.body;
 
-    // Überprüfen, ob die Community bereits existiert
-    db.get('SELECT * FROM communities WHERE name = ?', [communityName], (err, row) => {
+    // Überprüfen, wie viele Communities der Benutzer bereits hat
+    db.get('SELECT COUNT(*) as count FROM user_communities WHERE user_id = ?', [userId], (err, row) => {
         if (err) {
             return res.status(500).json({ message: 'Database error' });
         }
-        if (row) {
-            return res.status(400).json({ message: 'Community already exists' });
+        if (row.count >= 5) {
+            return res.status(400).json({ message: 'You cannot create or join more than 5 communities.' });
         }
 
-        // Community erstellen
-        db.run('INSERT INTO communities (name, user_id) VALUES (?, ?)', [communityName, userId], function (err) {
+        // Überprüfen, ob die Community bereits existiert
+        db.get('SELECT * FROM communities WHERE name = ?', [communityName], (err, row) => {
             if (err) {
-                return res.status(500).json({ message: 'Error creating community' });
+                return res.status(500).json({ message: 'Database error' });
+            }
+            if (row) {
+                return res.status(400).json({ message: 'Community already exists' });
             }
 
-            const communityId = this.lastID;
-
-            // Benutzer zur user_communities Tabelle hinzufügen
-            db.run('INSERT INTO user_communities (user_id, community_id) VALUES (?, ?)', [userId, communityId], function (err) {
+            // Community erstellen
+            db.run('INSERT INTO communities (name, user_id) VALUES (?, ?)', [communityName, userId], function (err) {
                 if (err) {
-                    return res.status(500).json({ message: 'Error adding user to community' });
+                    return res.status(500).json({ message: 'Error creating community' });
                 }
 
-                res.status(200).json({ message: 'Community created successfully' });
+                const communityId = this.lastID;
+
+                // Benutzer zur user_communities Tabelle hinzufügen
+                db.run('INSERT INTO user_communities (user_id, community_id) VALUES (?, ?)', [userId, communityId], function (err) {
+                    if (err) {
+                        return res.status(500).json({ message: 'Error adding user to community' });
+                    }
+
+                    res.status(200).json({ message: 'Community created successfully' });
+                });
             });
         });
     });
@@ -444,6 +454,53 @@ app.get('/api/user-community-sneak-previews', (req, res) => {
     });
 });
 
+// Endpoint zum Beitreten einer Community
+app.post('/join-community', (req, res) => {
+    const communityName = req.body.communityName;
+    const userId = req.body.userId;
+
+    // Überprüfen, wie viele Communities der Benutzer bereits hat
+    db.get('SELECT COUNT(*) as count FROM user_communities WHERE user_id = ?', [userId], (err, row) => {
+        if (err) {
+            return res.status(500).json({ message: 'Database error' });
+        }
+        if (row.count >= 5) {
+            return res.status(400).json({ message: 'You cannot create or join more than 5 communities.' });
+        }
+
+        db.get('SELECT id FROM communities WHERE name = ?', [communityName], (err, row) => {
+            if (err) {
+                console.error(err.message);
+                return res.status(500).json({ message: 'Server error' });
+            }
+            if (row) {
+                const communityId = row.id;
+
+                // Überprüfen, ob der Benutzer bereits in der Community ist
+                db.get('SELECT * FROM user_communities WHERE user_id = ? AND community_id = ?', [userId, communityId], (err, userCommunityRow) => {
+                    if (err) {
+                        console.error(err.message);
+                        return res.status(500).json({ message: 'Server error' });
+                    }
+                    if (userCommunityRow) {
+                        return res.status(400).json({ message: 'User is already a member of the community' });
+                    } else {
+                        db.run('INSERT INTO user_communities (user_id, community_id) VALUES (?, ?)', [userId, communityId], (err) => {
+                            if (err) {
+                                console.error(err.message);
+                                return res.status(500).json({ message: 'Server error' });
+                            }
+
+                            res.status(200).json({ message: 'Successfully joined the community' });
+                        });
+                    }
+                });
+            } else {
+                res.status(404).json({ message: 'Community not found: ' + communityName });
+            }
+        });
+    });
+});
 app.listen(3000, () => {
     console.log('Server läuft auf http://localhost:3000');
 });
