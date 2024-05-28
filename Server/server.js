@@ -302,7 +302,7 @@ app.get('/api/global-leaderboard', (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
 
-    db.all('SELECT username, current_points FROM users ORDER BY current_points DESC, id ASC LIMIT ? OFFSET ?', [limit, offset], (err, rows) => {
+    db.all('SELECT id as userId, username, current_points FROM users ORDER BY current_points DESC, id ASC LIMIT ? OFFSET ?', [limit, offset], (err, rows) => {
         if (err) {
             console.error(err.message);
             return res.status(500).json({ message: 'Server error' });
@@ -311,6 +311,7 @@ app.get('/api/global-leaderboard', (req, res) => {
         // Hinzufügen der Rangnummer
         const leaderboard = rows.map((row, index) => ({
             rank: offset + index + 1,
+            userId: row.userId,
             username: row.username,
             current_points: row.current_points
         }));

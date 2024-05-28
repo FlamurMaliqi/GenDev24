@@ -2,22 +2,23 @@ let currentPage = 1;
 const limit = 10;
 
 document.addEventListener('DOMContentLoaded', function() {
-    loadGlobalLeaderboard(currentPage, limit);
+    const userId = localStorage.getItem('userId'); // Assuming userId is stored in localStorage
+    loadGlobalLeaderboard(currentPage, limit, userId);
 
     document.getElementById('prev-page').addEventListener('click', function() {
         if (currentPage > 1) {
             currentPage--;
-            loadGlobalLeaderboard(currentPage, limit);
+            loadGlobalLeaderboard(currentPage, limit, userId);
         }
     });
 
     document.getElementById('next-page').addEventListener('click', function() {
         currentPage++;
-        loadGlobalLeaderboard(currentPage, limit);
+        loadGlobalLeaderboard(currentPage, limit, userId);
     });
 });
 
-function loadGlobalLeaderboard(page, limit) {
+function loadGlobalLeaderboard(page, limit, userId) {
     fetch(`http://localhost:3000/api/global-leaderboard?page=${page}&limit=${limit}`)
         .then(response => response.json())
         .then(data => {
@@ -26,6 +27,9 @@ function loadGlobalLeaderboard(page, limit) {
 
             data.forEach((entry, index) => {
                 const row = document.createElement('tr');
+                if (entry.userId == userId) {
+                    row.classList.add('highlight');
+                }
                 row.innerHTML = `
                     <td>${entry.rank}</td>
                     <td>${entry.username}</td>
