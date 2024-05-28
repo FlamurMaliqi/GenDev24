@@ -52,7 +52,6 @@ app.post('/register-user', (req, res) => {
     });
 });
 
-
 // Endpoint zum Abrufen der Communities für einen bestimmten Benutzer
 app.get('/api/user-communities', (req, res) => {
     const userId = req.query.userId;
@@ -170,31 +169,8 @@ app.get('/api/upcoming-games', (req, res) => {
             games.push(row);
         })
         .on('end', () => {
-            const upcomingGames = games
-                .filter(game => new Date(game.game_starts_at) > new Date())
-                .sort((a, b) => new Date(a.game_starts_at) - new Date(b.game_starts_at))
-                .slice(0, 3);
-            res.json(upcomingGames);
-        })
-        .on('error', (err) => {
-            console.error(err);
-            res.status(500).send('Server error');
-        });
-});
-
-// Endpoint zum Abrufen der nächsten drei Spiele
-app.get('/api/next-three-games', (req, res) => {
-    const games = [];
-    const csvFilePath = path.join(__dirname, 'game_schedule.csv');
-
-    fs.createReadStream(csvFilePath)
-        .pipe(csv({ separator: ';' }))
-        .on('data', (row) => {
-            games.push(row);
-        })
-        .on('end', () => {
             const now = new Date();
-            const nextThreeGames = games
+            const upcomingGames = games
                 .map(game => {
                     game.game_starts_at = new Date(game.game_starts_at);
                     return game;
@@ -202,9 +178,9 @@ app.get('/api/next-three-games', (req, res) => {
                 .filter(game => game.game_starts_at > now)
                 .sort((a, b) => a.game_starts_at - b.game_starts_at)
                 .slice(0, 3);
-                
-            if (nextThreeGames.length > 0) {
-                res.json(nextThreeGames);
+
+            if (upcomingGames.length > 0) {
+                res.json(upcomingGames);
             } else {
                 res.status(404).json({ message: 'No upcoming games found' });
             }
@@ -213,43 +189,6 @@ app.get('/api/next-three-games', (req, res) => {
             console.error(err);
             res.status(500).send('Server error');
         });
-});
-
-app.post('/join-community', (req, res) => {
-    const communityName = req.body.communityName;
-    const userId = req.body.userId;
-
-    db.get('SELECT id FROM communities WHERE name = ?', [communityName], (err, row) => {
-        if (err) {
-            console.error(err.message);
-            return res.status(500).json({ message: 'Server error' });
-        }
-        if (row) {
-            const communityId = row.id;
-
-            // Überprüfen, ob der Benutzer bereits in der Community ist
-            db.get('SELECT * FROM user_communities WHERE user_id = ? AND community_id = ?', [userId, communityId], (err, userCommunityRow) => {
-                if (err) {
-                    console.error(err.message);
-                    return res.status(500).json({ message: 'Server error' });
-                }
-                if (userCommunityRow) {
-                    return res.status(400).json({ message: 'User is already a member of the community' });
-                } else {
-                    db.run('INSERT INTO user_communities (user_id, community_id) VALUES (?, ?)', [userId, communityId], (err) => {
-                        if (err) {
-                            console.error(err.message);
-                            return res.status(500).json({ message: 'Server error' });
-                        }
-
-                        res.status(200).json({ message: 'Successfully joined the community' });
-                    });
-                }
-            });
-        } else {
-            res.status(404).json({ message: 'Community not found: ' + communityName });
-        }
-    });
 });
 
 // Endpoint zum Platzieren einer Wette basierend auf game_starts_at
@@ -341,7 +280,6 @@ function calculatePoints(actualHomeScore, actualAwayScore, betHomeScore, betAway
         return 8; // Exact result
     }
 
-
     if (actualGoalDifference === betGoalDifference && actualGoalDifference !== 0) {
         return 6; // Correct goal difference (non-draw)
     }
@@ -357,6 +295,29 @@ function calculatePoints(actualHomeScore, actualAwayScore, betHomeScore, betAway
 
     return 0; // Everything else
 }
+
+// Endpoint zum Abrufen des globalen Leaderboards
+app.get('/api/global-leaderboard', (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    db.all('SELECT username, current_points FROM users ORDER BY current_points DESC, id ASC LIMIT ? OFFSET ?', [limit, offset], (err, rows) => {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).json({ message: 'Server error' });
+        }
+
+        // Hinzufügen der Rangnummer
+        const leaderboard = rows.map((row, index) => ({
+            rank: offset + index + 1,
+            username: row.username,
+            current_points: row.current_points
+        }));
+
+        res.json(leaderboard);
+    });
+});
 
 app.listen(3000, () => {
     console.log('Server läuft auf http://localhost:3000');

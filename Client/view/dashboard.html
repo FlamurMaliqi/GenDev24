@@ -8,30 +8,41 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
-
     <link rel="stylesheet" href="styles/general.css" />
+
     <style>
         .leaderboard-table {
             width: 100%;
             margin-top: 20px;
             border-collapse: collapse;
         }
-        .leaderboard-table th, .leaderboard-table td {
+
+        .leaderboard-table th,
+        .leaderboard-table td {
             padding: 10px;
             text-align: center;
             border: 1px solid #ddd;
         }
+
         .leaderboard-table th {
             background-color: #f2f2f2;
         }
+
         .highlight {
             background-color: #e6f7ff;
         }
-        .community-preview, .global-preview {
-            margin-top: 20px;
+
+        .nav-arrows {
+            text-align: center;
+        }
+
+        .nav-arrows button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
         }
     </style>
-
 </head>
 
 <body>
@@ -53,63 +64,6 @@
     <!-- Dashboard -->
     <div class="container mt-5">
         <h2 class="text-center text-dark">Dashboard</h2>
-        
-        <!-- Current Standings -->
-        <h3>Current Standings</h3>
-        <table class="leaderboard-table">
-            <thead>
-                <tr>
-                    <th>Pos</th>
-                    <th>+/-</th>
-                    <th>Name</th>
-                    <th>GER:SCO</th>
-                    <th>HUN:CHE</th>
-                    <th>P</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>36</td>
-                    <td>0</td>
-                    <td>Marc</td>
-                    <td>-:-</td>
-                    <td>-:-</td>
-                    <td>0</td>
-                </tr>
-                <tr>
-                    <td>36</td>
-                    <td>0</td>
-                    <td>Micha232</td>
-                    <td>-:-</td>
-                    <td>-:-</td>
-                    <td>0</td>
-                </tr>
-                <tr>
-                    <td>36</td>
-                    <td>0</td>
-                    <td>Henner</td>
-                    <td>-:-</td>
-                    <td>-:-</td>
-                    <td>0</td>
-                </tr>
-                <tr>
-                    <td>36</td>
-                    <td>0</td>
-                    <td>Ball34</td>
-                    <td>-:-</td>
-                    <td>-:-</td>
-                    <td>0</td>
-                </tr>
-                <tr>
-                    <td>36</td>
-                    <td>0</td>
-                    <td>Johannes</td>
-                    <td>-:-</td>
-                    <td>-:-</td>
-                    <td>0</td>
-                </tr>
-            </tbody>
-        </table>
 
         <!-- Upcoming Games -->
         <h3 class="mt-4">Upcoming Games</h3>
@@ -117,127 +71,31 @@
             <!-- Upcoming games will be loaded here -->
         </ul>
 
-        <!-- Community Leaderboard Preview -->
-        <div class="community-preview">
-            <h3 class="mt-4">Community Leaderboard Preview</h3>
-            <table class="leaderboard-table">
-                <thead>
-                    <tr>
-                        <th>Pos</th>
-                        <th>+/-</th>
-                        <th>Name</th>
-                        <th>GER:SCO</th>
-                        <th>HUN:CHE</th>
-                        <th>P</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>+3,112,316</td>
-                        <td>Lukas</td>
-                        <td>1:2</td>
-                        <td>0:2</td>
-                        <td>24</td>
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>+3,112,316</td>
-                        <td>BayernFan</td>
-                        <td>1:2</td>
-                        <td>0:2</td>
-                        <td>24</td>
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>+3,112,316</td>
-                        <td>123987</td>
-                        <td>1:2</td>
-                        <td>0:2</td>
-                        <td>24</td>
-                    </tr>
-                    <tr class="highlight">
-                        <td>1,111,924</td>
-                        <td>+2,000,393</td>
-                        <td>Henner</td>
-                        <td>0:1</td>
-                        <td>2:2</td>
-                        <td>6</td>
-                    </tr>
-                    <tr>
-                        <td>1,111,989</td>
-                        <td>+2,000,328</td>
-                        <td>Jvh</td>
-                        <td>1:0</td>
-                        <td>0:0</td>
-                        <td>4</td>
-                    </tr>
-                    <tr>
-                        <td>1,111,989</td>
-                        <td>+2,000,328</td>
-                        <td>Charly</td>
-                        <td>3:1</td>
-                        <td>1:1</td>
-                        <td>4</td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Global Leaderboard -->
+        <div class="global-preview mt-5">
+            <h3>Global Leaderboard</h3>
+            <div class="leaderboard">
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Username</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody id="global-leaderboard-body">
+                        <!-- Leaderboard data will be loaded here -->
+                    </tbody>
+                </table>
+                <div class="nav-arrows">
+                    <button id="prev-page">&lt; Previous</button>
+                    <button id="next-page">Next &gt;</button>
+                </div>
+            </div>
         </div>
+    </div>
 
-        <!-- Global Leaderboard Preview -->
-        <div class="global-preview">
-            <h3 class="mt-4">Global Leaderboard Preview</h3>
-            <table class="leaderboard-table">
-                <thead>
-                    <tr>
-                        <th>Pos</th>
-                        <th>+/-</th>
-                        <th>Name</th>
-                        <th>GER:SCO</th>
-                        <th>HUN:CHE</th>
-                        <th>P</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>+3,112,316</td>
-                        <td>Lukas</td>
-                        <td>1:2</td>
-                        <td>0:2</td>
-                        <td>24</td>
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>+3,112,316</td>
-                        <td>BayernFan</td>
-                        <td>1:2</td>
-                        <td>0:2</td>
-                        <td>24</td>
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>+3,112,316</td>
-                        <td>123987</td>
-                        <td>1:2</td>
-                        <td>0:2</td>
-                        <td>24</td>
-                    </tr>
-                    <tr class="highlight">
-                        <td>1,111,924</td>
-                        <td>+2,000,393</td>
-                        <td>Henner</td>
-                        <td>0:1</td>
-                        <td>2:2</td>
-                        <td>6</td>
-                    </tr>
-                    <tr>
-                        <td>1,111,989</td>
-                        <td>+2,000,328</td>
-                        <td>Jvh</td>
-                        <td>1:0</td>
-                        <td>0:0</td>
-                        <td>4</td>
-                    </tr>
-                   
     <script src="../control/dashboard.js"></script>
+</body>
+
+</html>

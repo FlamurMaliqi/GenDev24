@@ -1,7 +1,7 @@
 let selectedGame = null; // Variable to store the selected game
 
 document.addEventListener('DOMContentLoaded', function() {
-    fetch('http://localhost:3000/api/next-three-games')
+    fetch('http://localhost:3000/api/upcoming-games')
         .then(response => response.json())
         .then(games => {
             const gameSelect = document.getElementById('gameSelect');
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateTeams(selectedGame);
             });
         })
-        .catch(error => console.error('Error fetching next games:', error));
+        .catch(error => console.error('Error fetching upcoming games:', error));
 
     document.getElementById('bet-form').addEventListener('submit', function(event) {
         event.preventDefault();
