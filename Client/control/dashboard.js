@@ -2,7 +2,7 @@ let currentPage = 1;
 const limit = 10;
 
 document.addEventListener('DOMContentLoaded', function() {
-    const userId = localStorage.getItem('userId'); // Assuming userId is stored in localStorage
+    const userId = localStorage.getItem('userId');
 
     // Fetch upcoming games
     fetch('http://localhost:3000/api/upcoming-games')
@@ -19,22 +19,25 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => console.error('Error fetching upcoming games:', error));
 
     // Load global leaderboard
-    loadGlobalLeaderboard(currentPage, limit, userId);
+    loadGlobalLeaderboard(currentPage, limit);
 
     document.getElementById('prev-page').addEventListener('click', function() {
         if (currentPage > 1) {
             currentPage--;
-            loadGlobalLeaderboard(currentPage, limit, userId);
+            loadGlobalLeaderboard(currentPage, limit);
         }
     });
 
     document.getElementById('next-page').addEventListener('click', function() {
         currentPage++;
-        loadGlobalLeaderboard(currentPage, limit, userId);
+        loadGlobalLeaderboard(currentPage, limit);
     });
+
+    // Load community sneak previews
+    loadCommunitySneakPreviews(userId);
 });
 
-function loadGlobalLeaderboard(page, limit, userId) {
+function loadGlobalLeaderboard(page, limit) {
     fetch(`http://localhost:3000/api/global-leaderboard?page=${page}&limit=${limit}`)
         .then(response => response.json())
         .then(data => {
@@ -43,9 +46,6 @@ function loadGlobalLeaderboard(page, limit, userId) {
 
             data.forEach((entry, index) => {
                 const row = document.createElement('tr');
-                if (entry.userId == userId) {
-                    row.classList.add('highlight');
-                }
                 row.innerHTML = `
                     <td>${entry.rank}</td>
                     <td>${entry.username}</td>
@@ -67,4 +67,43 @@ function loadGlobalLeaderboard(page, limit, userId) {
             }
         })
         .catch(error => console.error('Error fetching global leaderboard:', error));
+}
+
+function loadCommunitySneakPreviews(userId) {
+    fetch(`http://localhost:3000/api/user-community-sneak-previews?userId=${userId}`)
+        .then(response => response.json())
+        .then(sneakPreviews => {
+            const container = document.getElementById('community-sneak-previews');
+            container.innerHTML = '';
+
+            sneakPreviews.forEach(preview => {
+                const previewDiv = document.createElement('div');
+                previewDiv.className = 'community-preview';
+                previewDiv.innerHTML = `
+                    <h3>${preview.community} Leaderboard</h3>
+                    <div class="leaderboard">
+                        <table class="leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Username</th>
+                                    <th>Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${preview.users.map(user => `
+                                    <tr${user.id === userId ? ' class="highlight"' : ''}>
+                                        <td>${user.rank}</td>
+                                        <td>${user.username}</td>
+                                        <td>${user.current_points}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                container.appendChild(previewDiv);
+            });
+        })
+        .catch(error => console.error('Error fetching community sneak previews:', error));
 }

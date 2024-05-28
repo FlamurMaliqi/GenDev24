@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const csv = require('csv-parser');
 const cors = require('cors');
+const async = require('async');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -317,6 +318,129 @@ app.get('/api/global-leaderboard', (req, res) => {
         }));
 
         res.json(leaderboard);
+    });
+});
+
+// Endpoint zum Abrufen der Sneak-Preview des Community-Leaderboards
+app.get('/api/community-sneak-peek', (req, res) => {
+    const userId = req.query.userId;
+
+    // Finde die Community-IDs, in denen der Benutzer Mitglied ist
+    db.all('SELECT community_id FROM user_communities WHERE user_id = ?', [userId], (err, rows) => {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).json({ message: 'Server error' });
+        }
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'User is not part of any community' });
+        }
+
+        const communityId = rows[0].community_id; // Für die Sneak-Preview verwenden wir die erste Community
+
+        // Abrufen der Daten für die Sneak-Preview
+        db.all('SELECT u.id as userId, u.username, u.current_points FROM user_communities uc JOIN users u ON uc.user_id = u.id WHERE uc.community_id = ? ORDER BY u.current_points DESC, u.id ASC', [communityId], (err, members) => {
+            if (err) {
+                console.error(err.message);
+                return res.status(500).json({ message: 'Server error' });
+            }
+
+            const userIndex = members.findIndex(member => member.userId === parseInt(userId));
+            const top3Users = members.slice(0, 3);
+            const lastUser = members[members.length - 1];
+            const currentUser = members[userIndex];
+            const userBefore = userIndex > 0 ? members[userIndex - 1] : null;
+            const userAfter = userIndex < members.length - 1 ? members[userIndex + 1] : null;
+
+            let sneakPeek = [...top3Users];
+            if (!sneakPeek.some(user => user.userId === currentUser.userId)) {
+                sneakPeek.push(currentUser);
+            }
+            if (userBefore && !sneakPeek.some(user => user.userId === userBefore.userId)) {
+                sneakPeek.push(userBefore);
+            }
+            if (userAfter && !sneakPeek.some(user => user.userId === userAfter.userId)) {
+                sneakPeek.push(userAfter);
+            }
+            if (!sneakPeek.some(user => user.userId === lastUser.userId)) {
+                sneakPeek.push(lastUser);
+            }
+
+            // Auffüllen der Sneak-Preview bis zu 7 Benutzer
+            while (sneakPeek.length < 7 && members.length > sneakPeek.length) {
+                for (let i = 0; i < members.length && sneakPeek.length < 7; i++) {
+                    if (!sneakPeek.some(user => user.userId === members[i].userId)) {
+                        sneakPeek.push(members[i]);
+                    }
+                }
+            }
+
+            res.json(sneakPeek);
+        });
+    });
+});
+
+// Endpoint zum Abrufen der Sneak-Preview für alle Communities des Benutzers
+app.get('/api/user-community-sneak-previews', (req, res) => {
+    const userId = req.query.userId;
+
+    db.all('SELECT * FROM communities WHERE id IN (SELECT community_id FROM user_communities WHERE user_id = ?)', [userId], (err, communities) => {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).send('Server error');
+        }
+
+        const sneakPreviews = [];
+
+        const getSneakPreview = (community, callback) => {
+            db.all('SELECT u.username, u.current_points FROM user_communities uc JOIN users u ON uc.user_id = u.id WHERE uc.community_id = ? ORDER BY u.current_points DESC, u.id ASC', [community.id], (err, rows) => {
+                if (err) {
+                    console.error(err.message);
+                    return callback(err);
+                }
+
+                // Berechne die Sneak-Preview
+                const userIndex = rows.findIndex(row => row.id === userId);
+                const sneakPreview = [];
+
+                // Top 3 users
+                sneakPreview.push(...rows.slice(0, 3));
+
+                // User before and after logged-in user
+                if (userIndex !== -1) {
+                    if (userIndex > 0) {
+                        sneakPreview.push(rows[userIndex - 1]);
+                    }
+                    sneakPreview.push(rows[userIndex]);
+                    if (userIndex < rows.length - 1) {
+                        sneakPreview.push(rows[userIndex + 1]);
+                    }
+                }
+
+                // Last user
+                if (rows.length > 3 && rows[rows.length - 1].id !== userId) {
+                    sneakPreview.push(rows[rows.length - 1]);
+                }
+
+                // Füllen, um 7 Benutzer zu haben
+                while (sneakPreview.length < 7 && sneakPreview.length < rows.length) {
+                    sneakPreview.push(rows[sneakPreview.length]);
+                }
+
+                sneakPreviews.push({ community: community.name, users: sneakPreview });
+
+                callback(null);
+            });
+        };
+
+        const tasks = communities.map(community => callback => getSneakPreview(community, callback));
+
+        async.parallel(tasks, err => {
+            if (err) {
+                return res.status(500).send('Server error');
+            }
+            res.json(sneakPreviews);
+        });
     });
 });
 
