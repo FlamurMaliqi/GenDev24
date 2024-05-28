@@ -44,27 +44,18 @@ function loadLeaderboard(communityId, page, limit) {
             var leaderboardBody = document.getElementById('leaderboard-body');
             leaderboardBody.innerHTML = '';
 
-            data.forEach((entry, index) => {
+            data.forEach((entry) => {
                 var row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${entry.current_rank}</td>
+                    <td>${entry.rank}</td>
                     <td>${entry.username}</td>
                     <td>${entry.current_points}</td>
                 `;
                 leaderboardBody.appendChild(row);
             });
 
-            if (data.length < limit) {
-                document.getElementById('next-page').style.display = 'none';
-            } else {
-                document.getElementById('next-page').style.display = 'inline';
-            }
-
-            if (currentPage === 1) {
-                document.getElementById('prev-page').style.display = 'none';
-            } else {
-                document.getElementById('prev-page').style.display = 'inline';
-            }
+            document.getElementById('next-page').style.display = data.length < limit ? 'none' : 'inline';
+            document.getElementById('prev-page').style.display = currentPage === 1 ? 'none' : 'inline';
         })
         .catch(error => console.error('Error fetching leaderboard:', error));
 }
@@ -76,10 +67,10 @@ function searchUser(communityId, username) {
             var leaderboardBody = document.getElementById('leaderboard-body');
             leaderboardBody.innerHTML = '';
 
-            data.forEach((entry, index) => {
+            data.forEach((entry) => {
                 var row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${entry.current_rank}</td>
+                    <td>${entry.rank}</td>
                     <td>${entry.username}</td>
                     <td>${entry.current_points}</td>
                 `;

@@ -41,7 +41,7 @@ app.post('/register-user', (req, res) => {
         if (row) {
             res.status(403).json({ message: 'Benutzer existiert bereits.' });
         } else {
-            db.run('INSERT INTO users (username, current_points, current_rank) VALUES (?, 0, 0)', [username], function(err) {
+            db.run('INSERT INTO users (username, current_points) VALUES (?, 0)', [username], function(err) {
                 if (err) {
                     console.error(err.message);
                     return res.status(500).send('Server error');
@@ -51,6 +51,7 @@ app.post('/register-user', (req, res) => {
         }
     });
 });
+
 
 // Endpoint zum Abrufen der Communities für einen bestimmten Benutzer
 app.get('/api/user-communities', (req, res) => {
@@ -114,19 +115,26 @@ app.get('/api/community', (req, res) => {
     });
 });
 
-// Endpoint zum Abrufen des Community-Leaderboards
+// Endpoint zum Abrufen der Community-Leaderboards
 app.get('/api/community-leaderboard', (req, res) => {
     const communityId = req.query.communityId;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
 
-    db.all('SELECT u.username, u.current_points, u.current_rank FROM user_communities uc JOIN users u ON uc.user_id = u.id WHERE uc.community_id = ? ORDER BY u.current_rank LIMIT ? OFFSET ?', [communityId, limit, offset], (err, rows) => {
+    db.all('SELECT u.username, u.current_points FROM user_communities uc JOIN users u ON uc.user_id = u.id WHERE uc.community_id = ? ORDER BY u.current_points DESC LIMIT ? OFFSET ?', [communityId, limit, offset], (err, rows) => {
         if (err) {
             console.error(err.message);
             return res.status(500).json({ message: 'Server error' });
         }
-        res.json(rows);
+
+        const leaderboard = rows.map((row, index) => ({
+            rank: offset + index + 1,
+            username: row.username,
+            current_points: row.current_points
+        }));
+
+        res.json(leaderboard);
     });
 });
 
@@ -135,12 +143,19 @@ app.get('/api/search-user', (req, res) => {
     const communityId = req.query.communityId;
     const username = req.query.username;
 
-    db.all('SELECT u.username, u.current_points, u.current_rank FROM user_communities uc JOIN users u ON uc.user_id = u.id WHERE uc.community_id = ? AND u.username LIKE ?', [communityId, `%${username}%`], (err, rows) => {
+    db.all('SELECT u.username, u.current_points FROM user_communities uc JOIN users u ON uc.user_id = u.id WHERE uc.community_id = ? AND u.username LIKE ? ORDER BY u.current_points DESC', [communityId, `%${username}%`], (err, rows) => {
         if (err) {
             console.error(err.message);
             return res.status(500).json({ message: 'Server error' });
         }
-        res.json(rows);
+
+        const leaderboard = rows.map((row, index) => ({
+            rank: index + 1,
+            username: row.username,
+            current_points: row.current_points
+        }));
+
+        res.json(leaderboard);
     });
 });
 
@@ -239,22 +254,19 @@ app.post('/join-community', (req, res) => {
 
 // Endpoint zum Platzieren einer Wette basierend auf game_starts_at
 app.post('/api/place-bet', (req, res) => {
-    const { userId, gameStartsAt, homeScore, awayScore } = req.body;
+    const { userId, gameStartsAt, homeTeam, awayTeam, homeScore, awayScore } = req.body;
 
     // Extrahiere nur das Datum
     const gameStartsAtDate = new Date(gameStartsAt).toISOString().split('T')[0];
-    console.log(gameStartsAtDate);
-    console.log(req.body.homeTeam);
-    console.log(req.body.awayTeam);
 
-    db.get('SELECT * FROM games WHERE DATE(game_starts_at) = ? AND team_home_name = ? AND team_away_name = ?', [gameStartsAtDate, req.body.homeTeam, req.body.awayTeam], (err, game) => {
+    db.get('SELECT * FROM games WHERE DATE(game_starts_at) = ? AND team_home_name = ? AND team_away_name = ?', [gameStartsAtDate, homeTeam, awayTeam], (err, game) => {
         if (err) {
             console.error(err.message);
-            return res.status(500).json({ message: 'Server error' });
+            return res.status(500).json({message: 'Server error'});
         }
 
         if (!game) {
-            return res.status(404).json({ message: 'Game not found' });
+            return res.status(404).json({message: 'Game not found'});
         }
 
         const gameStartsAtDateTime = new Date(game.game_starts_at);
@@ -264,12 +276,26 @@ app.post('/api/place-bet', (req, res) => {
             return res.status(400).json({ message: 'Betting for this game is closed' });
         }
 
-        db.run('INSERT INTO bets (user_id, game_id, home_score, away_score) VALUES (?, ?, ?, ?)', [userId, game.id, homeScore, awayScore], function(err) {
+        // Wette speichern
+        db.run('INSERT INTO bets (user_id, game_starts_at, team_home_name, team_away_name, home_score, away_score) VALUES (?, ?, ?, ?, ?, ?)', [userId, game.game_starts_at, homeTeam, awayTeam, homeScore, awayScore], function(err) {
             if (err) {
                 console.error(err.message);
                 return res.status(500).json({ message: 'Error placing bet' });
             }
-            res.status(200).json({ message: 'Bet placed successfully' });
+
+            // Punkte berechnen und aktualisieren, falls das Spiel bereits beendet ist
+            if (game.home_score !== null && game.away_score !== null) {
+                const points = calculatePoints(game.home_score, game.away_score, homeScore, awayScore);
+                db.run('UPDATE users SET current_points = current_points + ? WHERE id = ?', [points, userId], function(err) {
+                    if (err) {
+                        console.error(err.message);
+                        return res.status(500).json({ message: 'Error updating user points' });
+                    }
+                    res.status(200).json({ message: 'Bet placed and points updated successfully' });
+                });
+            } else {
+                res.status(200).json({ message: 'Bet placed successfully' });
+            }
         });
     });
 });
@@ -308,12 +334,13 @@ app.post('/api/update-game-result', (req, res) => {
 
 // Funktion zum Berechnen der Punkte basierend auf den Wettregeln
 function calculatePoints(actualHomeScore, actualAwayScore, betHomeScore, betAwayScore) {
-    if (actualHomeScore === betHomeScore && actualAwayScore === betAwayScore) {
+    const actualGoalDifference = actualHomeScore - actualAwayScore;
+    const betGoalDifference = betHomeScore - betAwayScore;
+
+    if (actualHomeScore == betHomeScore && actualAwayScore == betAwayScore) {
         return 8; // Exact result
     }
 
-    const actualGoalDifference = actualHomeScore - actualAwayScore;
-    const betGoalDifference = betHomeScore - betAwayScore;
 
     if (actualGoalDifference === betGoalDifference && actualGoalDifference !== 0) {
         return 6; // Correct goal difference (non-draw)

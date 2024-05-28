@@ -64,12 +64,14 @@ function placeBet(game) {
             awayScore: awayScore
         }),
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.message === 'Bet placed successfully') {
+    .then(response => {
+        if (response.status === 200) {
             alert('Bet placed successfully');
+            window.location.href = '/Client/view/communities.html';
         } else {
-            alert('Error placing bet: ' + data.message);
+            return response.json().then(data => {
+                alert('Error placing bet: ' + data.message);
+            });
         }
     })
     .catch(error => console.error('Error placing bet:', error));
