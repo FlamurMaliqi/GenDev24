@@ -66,6 +66,31 @@ app.get('/api/user-communities', (req, res) => {
     });
 });
 
+// Endpoint zum Pinnen und Entpinnen von Benutzern
+app.post('/api/pin-user', (req, res) => {
+    const { userId, communityId, targetUserId, action } = req.body;
+
+    if (action === 'pin') {
+        db.run('INSERT INTO pinned_users (user_id, community_id, pinned_user_id) VALUES (?, ?, ?)', [userId, communityId, targetUserId], function(err) {
+            if (err) {
+                console.error(err.message);
+                return res.status(500).json({ message: 'Error pinning user' });
+            }
+            res.status(200).json({ message: 'User pinned successfully' });
+        });
+    } else if (action === 'unpin') {
+        db.run('DELETE FROM pinned_users WHERE user_id = ? AND community_id = ? AND pinned_user_id = ?', [userId, communityId, targetUserId], function(err) {
+            if (err) {
+                console.error(err.message);
+                return res.status(500).json({ message: 'Error unpinning user' });
+            }
+            res.status(200).json({ message: 'User unpinned successfully' });
+        });
+    } else {
+        res.status(400).json({ message: 'Invalid action' });
+    }
+})
+
 // Route zum Erstellen einer Community
 app.post('/create-community', (req, res) => {
     const { communityName, userId } = req.body;
@@ -125,26 +150,50 @@ app.get('/api/community', (req, res) => {
     });
 });
 
-// Endpoint zum Abrufen der Community-Leaderboards
+// Endpoint zum Abrufen der Community-Leaderboards mit gepinnten Benutzern
 app.get('/api/community-leaderboard', (req, res) => {
     const communityId = req.query.communityId;
+    const userId = req.query.userId;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
 
-    db.all('SELECT u.username, u.current_points FROM user_communities uc JOIN users u ON uc.user_id = u.id WHERE uc.community_id = ? ORDER BY u.current_points DESC LIMIT ? OFFSET ?', [communityId, limit, offset], (err, rows) => {
+    // Retrieve pinned users
+    db.all('SELECT pinned_user_id FROM pinned_users WHERE user_id = ? AND community_id = ?', [userId, communityId], (err, pinnedRows) => {
         if (err) {
             console.error(err.message);
             return res.status(500).json({ message: 'Server error' });
         }
 
-        const leaderboard = rows.map((row, index) => ({
-            rank: offset + index + 1,
-            username: row.username,
-            current_points: row.current_points
-        }));
+        const pinnedUserIds = pinnedRows.map(row => row.pinned_user_id);
 
-        res.json(leaderboard);
+        db.all('SELECT u.id as userId, u.username, u.current_points FROM user_communities uc JOIN users u ON uc.user_id = u.id WHERE uc.community_id = ? ORDER BY u.current_points DESC, u.id ASC LIMIT ? OFFSET ?', [communityId, limit, offset], (err, rows) => {
+            if (err) {
+                console.error(err.message);
+                return res.status(500).json({ message: 'Server error' });
+            }
+
+            // Add pinned users to the leaderboard
+            const pinnedUsersQuery = pinnedUserIds.length > 0 ? ` OR u.id IN (${pinnedUserIds.join(',')})` : '';
+            db.all(`SELECT u.id as userId, u.username, u.current_points FROM user_communities uc JOIN users u ON uc.user_id = u.id WHERE uc.community_id = ?${pinnedUsersQuery} ORDER BY u.current_points DESC, u.id ASC`, [communityId], (err, pinnedRows) => {
+                if (err) {
+                    console.error(err.message);
+                    return res.status(500).json({ message: 'Server error' });
+                }
+
+                const uniqueRows = [...new Map([...rows, ...pinnedRows].map(item => [item['userId'], item])).values()];
+
+                const leaderboard = uniqueRows.map((row, index) => ({
+                    rank: offset + index + 1,
+                    userId: row.userId,
+                    username: row.username,
+                    current_points: row.current_points,
+                    pinned: pinnedUserIds.includes(row.userId)
+                }));
+
+                res.json(leaderboard);
+            });
+        });
     });
 });
 

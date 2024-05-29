@@ -9,7 +9,7 @@ db.serialize(() => {
     db.run("CREATE TABLE IF NOT EXISTS communities (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, user_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id))");
     db.run("CREATE TABLE IF NOT EXISTS user_communities (user_id INTEGER, community_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id), FOREIGN KEY(community_id) REFERENCES communities(id))");
     db.run("CREATE TABLE IF NOT EXISTS leaderboard (id INTEGER PRIMARY KEY AUTOINCREMENT, community_id INTEGER, user_id INTEGER, FOREIGN KEY(community_id) REFERENCES communities(id), FOREIGN KEY(user_id) REFERENCES users(id))");
-    
+
     // Neue Tabelle für Spiele
     db.run(`CREATE TABLE IF NOT EXISTS games (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,6 +40,17 @@ db.serialize(() => {
         home_score INTEGER,
         away_score INTEGER,
         FOREIGN KEY(user_id) REFERENCES users(id)
+    )`);
+
+    // Neue Tabelle für gepinnte Benutzer
+    db.run(`CREATE TABLE IF NOT EXISTS pinned_users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        community_id INTEGER,
+        pinned_user_id INTEGER,
+        FOREIGN KEY(user_id) REFERENCES users(id),
+        FOREIGN KEY(community_id) REFERENCES communities(id),
+        FOREIGN KEY(pinned_user_id) REFERENCES users(id)
     )`);
 });
 
