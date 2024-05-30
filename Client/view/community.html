@@ -46,6 +46,14 @@
         .pinned {
             background-color: #fff3cd;
         }
+
+        .hidden {
+            display: none;
+        }
+
+        .section-title {
+            margin-top: 20px;
+        }
     </style>
 </head>
 
@@ -69,42 +77,90 @@
     <div class="container mt-5">
         <h2 id="community-name" class="text-center text-dark"></h2>
         <div class="leaderboard">
-            <div id="top-users" class="mt-4">
-                <h3>Top 3 Users</h3>
-                <ul id="top-users-list" class="list-group"></ul>
+            <div id="top-users" class="hidden">
+                <h3 class="section-title"></h3>
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Username</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody id="top-users-list">
+                        <!-- Top 3 users will be loaded here -->
+                    </tbody>
+                </table>
             </div>
 
-            <div id="current-user" class="mt-4">
-                <h3>Current User</h3>
-                <ul id="current-user-list" class="list-group"></ul>
+            <div id="current-user" class="hidden">
+                <h3 class="section-title"></h3>
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Username</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody id="current-user-list">
+                        <!-- Current user will be loaded here -->
+                    </tbody>
+                </table>
             </div>
 
-            <div id="last-user" class="mt-4">
-                <h3>Last User</h3>
-                <ul id="last-user-list" class="list-group"></ul>
+            <div id="last-user" class="hidden">
+                <h3 class="section-title"></h3>
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Username</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody id="last-user-list">
+                        <!-- Last user will be loaded here -->
+                    </tbody>
+                </table>
             </div>
 
-            <div id="pinned-users" class="mt-4">
-                <h3>Pinned Users</h3>
-                <ul id="pinned-users-list" class="list-group"></ul>
+            <div id="pinned-users" class="hidden">
+                <h3 class="section-title"></h3>
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Username</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pinned-users-list">
+                        <!-- Pinned users will be loaded here -->
+                    </tbody>
+                </table>
             </div>
 
-            <table class="leaderboard-table">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Username</th>
-                        <th>Points</th>
-                    </tr>
-                </thead>
-                <tbody id="leaderboard-body">
-                    <!-- Leaderboard data will be loaded here -->
-                </tbody>
-            </table>
-            <div class="nav-arrows">
-                <button id="prev-page">&lt; Previous</button>
-                <button id="next-page">Next &gt;</button>
+            <button class="btn btn-info mt-4" onclick="toggleVisibility('full-leaderboard')">Toggle Full Leaderboard</button>
+            <div id="full-leaderboard" class="hidden">
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Username</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <!-- Leaderboard data will be loaded here -->
+                    </tbody>
+                </table>
+                <div class="nav-arrows">
+                    <button id="prev-page">&lt; Previous</button>
+                    <button id="next-page">Next &gt;</button>
+                </div>
             </div>
+
             <h3 class="mt-4">Search User</h3>
             <form id="search-form">
                 <div class="form-group">
