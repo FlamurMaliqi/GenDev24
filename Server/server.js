@@ -9,11 +9,10 @@ const async = require('async');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json()); // Wichtig für JSON POST requests
+app.use(bodyParser.json());
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Endpoint zum Überprüfen von Benutzern
 app.post('/check-user', (req, res) => {
     const username = req.body.username;
 
@@ -30,7 +29,6 @@ app.post('/check-user', (req, res) => {
     });
 });
 
-// Endpoint zum Hinzufügen von Benutzern
 app.post('/register-user', (req, res) => {
     const username = req.body.username;
 
@@ -53,7 +51,6 @@ app.post('/register-user', (req, res) => {
     });
 });
 
-// Endpoint zum Abrufen der Communities für einen bestimmten Benutzer
 app.get('/api/user-communities', (req, res) => {
     const userId = req.query.userId;
 
@@ -66,7 +63,6 @@ app.get('/api/user-communities', (req, res) => {
     });
 });
 
-// Endpoint zum Pinnen und Entpinnen von Benutzern
 app.post('/api/pin-user', (req, res) => {
     const { userId, communityId, targetUserId, action } = req.body;
 
@@ -89,13 +85,11 @@ app.post('/api/pin-user', (req, res) => {
     } else {
         res.status(400).json({ message: 'Invalid action' });
     }
-})
+});
 
-// Route zum Erstellen einer Community
 app.post('/create-community', (req, res) => {
     const { communityName, userId } = req.body;
 
-    // Überprüfen, wie viele Communities der Benutzer bereits hat
     db.get('SELECT COUNT(*) as count FROM user_communities WHERE user_id = ?', [userId], (err, row) => {
         if (err) {
             return res.status(500).json({ message: 'Database error' });
@@ -104,7 +98,6 @@ app.post('/create-community', (req, res) => {
             return res.status(400).json({ message: 'You cannot create or join more than 5 communities.' });
         }
 
-        // Überprüfen, ob die Community bereits existiert
         db.get('SELECT * FROM communities WHERE name = ?', [communityName], (err, row) => {
             if (err) {
                 return res.status(500).json({ message: 'Database error' });
@@ -113,7 +106,6 @@ app.post('/create-community', (req, res) => {
                 return res.status(400).json({ message: 'Community already exists' });
             }
 
-            // Community erstellen
             db.run('INSERT INTO communities (name, user_id) VALUES (?, ?)', [communityName, userId], function (err) {
                 if (err) {
                     return res.status(500).json({ message: 'Error creating community' });
@@ -121,7 +113,6 @@ app.post('/create-community', (req, res) => {
 
                 const communityId = this.lastID;
 
-                // Benutzer zur user_communities Tabelle hinzufügen
                 db.run('INSERT INTO user_communities (user_id, community_id) VALUES (?, ?)', [userId, communityId], function (err) {
                     if (err) {
                         return res.status(500).json({ message: 'Error adding user to community' });
@@ -134,7 +125,6 @@ app.post('/create-community', (req, res) => {
     });
 });
 
-// Endpoint zum Abrufen der Community-Details
 app.get('/api/community', (req, res) => {
     const communityId = req.query.communityId;
 
@@ -150,7 +140,6 @@ app.get('/api/community', (req, res) => {
     });
 });
 
-// Endpoint zum Abrufen der Community-Leaderboards mit zusätzlichen Benutzern
 app.get('/api/community-leaderboard', (req, res) => {
     const communityId = req.query.communityId;
     const userId = req.query.userId;
@@ -158,7 +147,6 @@ app.get('/api/community-leaderboard', (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
 
-    // Retrieve pinned users
     db.all('SELECT pinned_user_id FROM pinned_users WHERE user_id = ? AND community_id = ?', [userId, communityId], (err, pinnedRows) => {
         if (err) {
             console.error(err.message);
@@ -181,7 +169,6 @@ app.get('/api/community-leaderboard', (req, res) => {
                 pinned: pinnedUserIds.includes(row.userId)
             }));
 
-            // Fetch additional user data
             db.all('SELECT u.id as userId, u.username, u.current_points FROM user_communities uc JOIN users u ON uc.user_id = u.id WHERE uc.community_id = ? ORDER BY u.current_points DESC, u.id ASC', [communityId], (err, allRows) => {
                 if (err) {
                     console.error(err.message);
@@ -206,8 +193,8 @@ app.get('/api/community-leaderboard', (req, res) => {
                     ...allRows[allRows.length - 1]
                 };
 
-                const pinnedUsers = allRows.filter(row => pinnedUserIds.includes(row.userId)).map((row, index) => ({
-                    rank: allRows.indexOf(row) + 1,
+                const pinnedUsers = allRows.filter(row => pinnedUserIds.includes(row.userId)).map((row) => ({
+                    rank: allRows.findIndex(r => r.userId === row.userId) + 1,
                     userId: row.userId,
                     username: row.username,
                     current_points: row.current_points,
@@ -219,9 +206,6 @@ app.get('/api/community-leaderboard', (req, res) => {
     });
 });
 
-
-
-// Endpoint zum Suchen von Benutzern im Leaderboard
 app.get('/api/search-user', (req, res) => {
     const communityId = req.query.communityId;
     const username = req.query.username;
@@ -242,7 +226,6 @@ app.get('/api/search-user', (req, res) => {
     });
 });
 
-// Endpoint zum Abrufen der bevorstehenden Spiele
 app.get('/api/upcoming-games', (req, res) => {
     const games = [];
     const csvFilePath = path.join(__dirname, 'game_schedule.csv');
@@ -275,11 +258,9 @@ app.get('/api/upcoming-games', (req, res) => {
         });
 });
 
-// Endpoint zum Platzieren einer Wette basierend auf game_starts_at
 app.post('/api/place-bet', (req, res) => {
     const { userId, gameStartsAt, homeTeam, awayTeam, homeScore, awayScore } = req.body;
 
-    // Extrahiere nur das Datum
     const gameStartsAtDate = new Date(gameStartsAt).toISOString().split('T')[0];
 
     db.get('SELECT * FROM games WHERE DATE(game_starts_at) = ? AND team_home_name = ? AND team_away_name = ?', [gameStartsAtDate, homeTeam, awayTeam], (err, game) => {
@@ -299,14 +280,12 @@ app.post('/api/place-bet', (req, res) => {
             return res.status(400).json({ message: 'Betting for this game is closed' });
         }
 
-        // Wette speichern
         db.run('INSERT INTO bets (user_id, game_starts_at, team_home_name, team_away_name, home_score, away_score) VALUES (?, ?, ?, ?, ?, ?)', [userId, game.game_starts_at, homeTeam, awayTeam, homeScore, awayScore], function(err) {
             if (err) {
                 console.error(err.message);
                 return res.status(500).json({ message: 'Error placing bet' });
             }
 
-            // Punkte berechnen und aktualisieren, falls das Spiel bereits beendet ist
             if (game.home_score !== null && game.away_score !== null) {
                 const points = calculatePoints(game.home_score, game.away_score, homeScore, awayScore);
                 db.run('UPDATE users SET current_points = current_points + ? WHERE id = ?', [points, userId], function(err) {
@@ -323,7 +302,6 @@ app.post('/api/place-bet', (req, res) => {
     });
 });
 
-// Endpoint zum Aktualisieren der Spielergebnisse und Berechnen der Punkte
 app.post('/api/update-game-result', (req, res) => {
     const { gameId, homeScore, awayScore } = req.body;
 
@@ -333,7 +311,6 @@ app.post('/api/update-game-result', (req, res) => {
             return res.status(500).json({ message: 'Error updating game result' });
         }
 
-        // Punkte berechnen und aktualisieren
         db.all('SELECT * FROM bets WHERE game_id = ?', [gameId], (err, bets) => {
             if (err) {
                 console.error(err.message);
@@ -355,32 +332,30 @@ app.post('/api/update-game-result', (req, res) => {
     });
 });
 
-// Funktion zum Berechnen der Punkte basierend auf den Wettregeln
 function calculatePoints(actualHomeScore, actualAwayScore, betHomeScore, betAwayScore) {
     const actualGoalDifference = actualHomeScore - actualAwayScore;
     const betGoalDifference = betHomeScore - betAwayScore;
 
     if (actualHomeScore == betHomeScore && actualAwayScore == betAwayScore) {
-        return 8; // Exact result
+        return 8;
     }
 
     if (actualGoalDifference === betGoalDifference && actualGoalDifference !== 0) {
-        return 6; // Correct goal difference (non-draw)
+        return 6;
     }
 
     if (actualGoalDifference === 0 && betGoalDifference === 0) {
-        return 4; // Correct goal difference (draw)
+        return 4;
     }
 
     if ((actualHomeScore > actualAwayScore && betHomeScore > betAwayScore) ||
         (actualHomeScore < actualAwayScore && betHomeScore < betAwayScore)) {
-        return 4; // Correct tendency
+        return 4;
     }
 
-    return 0; // Everything else
+    return 0;
 }
 
-// Endpoint zum Abrufen des globalen Leaderboards
 app.get('/api/global-leaderboard', (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -392,7 +367,6 @@ app.get('/api/global-leaderboard', (req, res) => {
             return res.status(500).json({ message: 'Server error' });
         }
 
-        // Hinzufügen der Rangnummer
         const leaderboard = rows.map((row, index) => ({
             rank: offset + index + 1,
             userId: row.userId,
@@ -404,11 +378,9 @@ app.get('/api/global-leaderboard', (req, res) => {
     });
 });
 
-// Endpoint zum Abrufen der Sneak-Preview des Community-Leaderboards
 app.get('/api/community-sneak-peek', (req, res) => {
     const userId = req.query.userId;
 
-    // Finde die Community-IDs, in denen der Benutzer Mitglied ist
     db.all('SELECT community_id FROM user_communities WHERE user_id = ?', [userId], (err, rows) => {
         if (err) {
             console.error(err.message);
@@ -419,9 +391,8 @@ app.get('/api/community-sneak-peek', (req, res) => {
             return res.status(404).json({ message: 'User is not part of any community' });
         }
 
-        const communityId = rows[0].community_id; // Für die Sneak-Preview verwenden wir die erste Community
+        const communityId = rows[0].community_id;
 
-        // Abrufen der Daten für die Sneak-Preview
         db.all('SELECT u.id as userId, u.username, u.current_points FROM user_communities uc JOIN users u ON uc.user_id = u.id WHERE uc.community_id = ? ORDER BY u.current_points DESC, u.id ASC', [communityId], (err, members) => {
             if (err) {
                 console.error(err.message);
@@ -449,7 +420,6 @@ app.get('/api/community-sneak-peek', (req, res) => {
                 sneakPeek.push(lastUser);
             }
 
-            // Auffüllen der Sneak-Preview bis zu 7 Benutzer
             while (sneakPeek.length < 7 && members.length > sneakPeek.length) {
                 for (let i = 0; i < members.length && sneakPeek.length < 7; i++) {
                     if (!sneakPeek.some(user => user.userId === members[i].userId)) {
@@ -458,12 +428,14 @@ app.get('/api/community-sneak-peek', (req, res) => {
                 }
             }
 
-            res.json(sneakPeek);
+            res.json(sneakPeek.map((user, index) => ({
+                ...user,
+                rank: members.findIndex(m => m.userId === user.userId) + 1
+            })));
         });
     });
 });
 
-// Endpoint zum Abrufen der Sneak-Preview für alle Communities des Benutzers
 app.get('/api/user-community-sneak-previews', (req, res) => {
     const userId = req.query.userId;
 
@@ -476,41 +448,52 @@ app.get('/api/user-community-sneak-previews', (req, res) => {
         const sneakPreviews = [];
 
         const getSneakPreview = (community, callback) => {
-            db.all('SELECT u.username, u.current_points FROM user_communities uc JOIN users u ON uc.user_id = u.id WHERE uc.community_id = ? ORDER BY u.current_points DESC, u.id ASC', [community.id], (err, rows) => {
+            db.all('SELECT u.id as userId, u.username, u.current_points FROM user_communities uc JOIN users u ON uc.user_id = u.id WHERE uc.community_id = ? ORDER BY u.current_points DESC, u.id ASC', [community.id], (err, rows) => {
                 if (err) {
                     console.error(err.message);
                     return callback(err);
                 }
 
-                // Berechne die Sneak-Preview
-                const userIndex = rows.findIndex(row => row.id === userId);
-                const sneakPreview = [];
+                const userIndex = rows.findIndex(row => row.userId == userId);
+                const top3Users = rows.slice(0, 3);
+                const currentUser = rows[userIndex];
+                const userBefore = userIndex > 0 ? rows[userIndex - 1] : null;
+                const userAfter = userIndex < rows.length - 1 ? rows[userIndex + 1] : null;
+                const lastUser = rows[rows.length - 1];
 
-                // Top 3 users
-                sneakPreview.push(...rows.slice(0, 3));
+                let sneakPeek = [...top3Users];
 
-                // User before and after logged-in user
-                if (userIndex !== -1) {
-                    if (userIndex > 0) {
-                        sneakPreview.push(rows[userIndex - 1]);
+                if (userBefore) {
+                    sneakPeek.push(userBefore);
+                }
+
+                if (!sneakPeek.some(user => user.userId === currentUser.userId)) {
+                    sneakPeek.push(currentUser);
+                }
+
+                if (userAfter && !sneakPeek.some(user => user.userId === userAfter.userId)) {
+                    sneakPeek.push(userAfter);
+                }
+
+                if (!sneakPeek.some(user => user.userId === lastUser.userId)) {
+                    sneakPeek.push(lastUser);
+                }
+
+                while (sneakPeek.length < 7 && rows.length > sneakPeek.length) {
+                    for (let i = 0; i < rows.length && sneakPeek.length < 7; i++) {
+                        if (!sneakPeek.some(user => user.userId === rows[i].userId)) {
+                            sneakPeek.push(rows[i]);
+                        }
                     }
-                    sneakPreview.push(rows[userIndex]);
-                    if (userIndex < rows.length - 1) {
-                        sneakPreview.push(rows[userIndex + 1]);
-                    }
                 }
 
-                // Last user
-                if (rows.length > 3 && rows[rows.length - 1].id !== userId) {
-                    sneakPreview.push(rows[rows.length - 1]);
-                }
-
-                // Füllen, um 7 Benutzer zu haben
-                while (sneakPreview.length < 7 && sneakPreview.length < rows.length) {
-                    sneakPreview.push(rows[sneakPreview.length]);
-                }
-
-                sneakPreviews.push({ community: community.name, users: sneakPreview });
+                sneakPreviews.push({
+                    community: community.name,
+                    users: sneakPeek.map(user => ({
+                        ...user,
+                        rank: rows.findIndex(r => r.userId === user.userId) + 1
+                    }))
+                });
 
                 callback(null);
             });
@@ -527,12 +510,10 @@ app.get('/api/user-community-sneak-previews', (req, res) => {
     });
 });
 
-// Endpoint zum Beitreten einer Community
 app.post('/join-community', (req, res) => {
     const communityName = req.body.communityName;
     const userId = req.body.userId;
 
-    // Überprüfen, wie viele Communities der Benutzer bereits hat
     db.get('SELECT COUNT(*) as count FROM user_communities WHERE user_id = ?', [userId], (err, row) => {
         if (err) {
             return res.status(500).json({ message: 'Database error' });
@@ -549,7 +530,6 @@ app.post('/join-community', (req, res) => {
             if (row) {
                 const communityId = row.id;
 
-                // Überprüfen, ob der Benutzer bereits in der Community ist
                 db.get('SELECT * FROM user_communities WHERE user_id = ? AND community_id = ?', [userId, communityId], (err, userCommunityRow) => {
                     if (err) {
                         console.error(err.message);
@@ -574,6 +554,7 @@ app.post('/join-community', (req, res) => {
         });
     });
 });
+
 app.listen(3000, () => {
     console.log('Server läuft auf http://localhost:3000');
 });

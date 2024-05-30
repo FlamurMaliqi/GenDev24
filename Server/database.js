@@ -5,12 +5,19 @@ let db = new sqlite3.Database('database.db');
 
 // Erstellen der Tabellen für Benutzer und Communities
 db.serialize(() => {
-    db.run("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, current_points INTEGER DEFAULT 0)");
+    // Users table with registration_date
+    db.run("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, current_points INTEGER DEFAULT 0, registration_date DATETIME DEFAULT CURRENT_TIMESTAMP)");
+
+    // Communities table
     db.run("CREATE TABLE IF NOT EXISTS communities (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, user_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id))");
+
+    // User communities table
     db.run("CREATE TABLE IF NOT EXISTS user_communities (user_id INTEGER, community_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id), FOREIGN KEY(community_id) REFERENCES communities(id))");
+
+    // Leaderboard table
     db.run("CREATE TABLE IF NOT EXISTS leaderboard (id INTEGER PRIMARY KEY AUTOINCREMENT, community_id INTEGER, user_id INTEGER, FOREIGN KEY(community_id) REFERENCES communities(id), FOREIGN KEY(user_id) REFERENCES users(id))");
 
-    // Neue Tabelle für Spiele
+    // Games table
     db.run(`CREATE TABLE IF NOT EXISTS games (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         team_home_name TEXT,
@@ -30,7 +37,7 @@ db.serialize(() => {
         }
     });
 
-    // Neue Tabelle für Wetten
+    // Bets table
     db.run(`CREATE TABLE IF NOT EXISTS bets (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER,
@@ -42,7 +49,7 @@ db.serialize(() => {
         FOREIGN KEY(user_id) REFERENCES users(id)
     )`);
 
-    // Neue Tabelle für gepinnte Benutzer
+    // Pinned users table
     db.run(`CREATE TABLE IF NOT EXISTS pinned_users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER,

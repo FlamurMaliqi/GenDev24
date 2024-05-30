@@ -95,7 +95,7 @@ function loadCommunitySneakPreviews(userId) {
                             </thead>
                             <tbody>
                                 ${preview.users.map(user => `
-                                    <tr${user.id === userId ? ' class="highlight"' : ''}>
+                                    <tr${user.userId === parseInt(userId) ? ' class="highlight"' : ''}>
                                         <td>${user.rank}</td>
                                         <td>${user.username}</td>
                                         <td>${user.current_points}</td>
