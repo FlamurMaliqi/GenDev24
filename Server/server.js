@@ -150,7 +150,7 @@ app.get('/api/community', (req, res) => {
     });
 });
 
-// Endpoint zum Abrufen der Community-Leaderboards mit gepinnten Benutzern
+// Endpoint zum Abrufen der Community-Leaderboards mit zusätzlichen Benutzern
 app.get('/api/community-leaderboard', (req, res) => {
     const communityId = req.query.communityId;
     const userId = req.query.userId;
@@ -173,29 +173,53 @@ app.get('/api/community-leaderboard', (req, res) => {
                 return res.status(500).json({ message: 'Server error' });
             }
 
-            // Add pinned users to the leaderboard
-            const pinnedUsersQuery = pinnedUserIds.length > 0 ? ` OR u.id IN (${pinnedUserIds.join(',')})` : '';
-            db.all(`SELECT u.id as userId, u.username, u.current_points FROM user_communities uc JOIN users u ON uc.user_id = u.id WHERE uc.community_id = ?${pinnedUsersQuery} ORDER BY u.current_points DESC, u.id ASC`, [communityId], (err, pinnedRows) => {
+            const leaderboard = rows.map((row, index) => ({
+                rank: offset + index + 1,
+                userId: row.userId,
+                username: row.username,
+                current_points: row.current_points,
+                pinned: pinnedUserIds.includes(row.userId)
+            }));
+
+            // Fetch additional user data
+            db.all('SELECT u.id as userId, u.username, u.current_points FROM user_communities uc JOIN users u ON uc.user_id = u.id WHERE uc.community_id = ? ORDER BY u.current_points DESC, u.id ASC', [communityId], (err, allRows) => {
                 if (err) {
                     console.error(err.message);
                     return res.status(500).json({ message: 'Server error' });
                 }
 
-                const uniqueRows = [...new Map([...rows, ...pinnedRows].map(item => [item['userId'], item])).values()];
-
-                const leaderboard = uniqueRows.map((row, index) => ({
-                    rank: offset + index + 1,
+                const topUsers = allRows.slice(0, 3).map((row, index) => ({
+                    rank: index + 1,
                     userId: row.userId,
                     username: row.username,
                     current_points: row.current_points,
-                    pinned: pinnedUserIds.includes(row.userId)
                 }));
 
-                res.json(leaderboard);
+                const currentUserIndex = allRows.findIndex(row => row.userId == userId);
+                const currentUser = {
+                    rank: currentUserIndex + 1,
+                    ...allRows[currentUserIndex]
+                };
+
+                const lastUser = {
+                    rank: allRows.length,
+                    ...allRows[allRows.length - 1]
+                };
+
+                const pinnedUsers = allRows.filter(row => pinnedUserIds.includes(row.userId)).map((row, index) => ({
+                    rank: allRows.indexOf(row) + 1,
+                    userId: row.userId,
+                    username: row.username,
+                    current_points: row.current_points,
+                }));
+
+                res.json({ leaderboard, topUsers, currentUser, lastUser, pinnedUsers });
             });
         });
     });
 });
+
+
 
 // Endpoint zum Suchen von Benutzern im Leaderboard
 app.get('/api/search-user', (req, res) => {

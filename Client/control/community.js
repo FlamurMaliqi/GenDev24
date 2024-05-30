@@ -1,8 +1,7 @@
 let currentPage = 1;
 const limit = 10;
-let pinnedUsers = new Set();
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     var urlParams = new URLSearchParams(window.location.search);
     var communityId = urlParams.get('communityId');
     const userId = localStorage.getItem('userId');
@@ -20,20 +19,20 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Error fetching community:', error));
 
-    document.getElementById('search-form').addEventListener('submit', function(event) {
+    document.getElementById('search-form').addEventListener('submit', function (event) {
         event.preventDefault();
         const username = document.getElementById('searchUser').value;
         searchUser(communityId, username, userId);
     });
 
-    document.getElementById('prev-page').addEventListener('click', function() {
+    document.getElementById('prev-page').addEventListener('click', function () {
         if (currentPage > 1) {
             currentPage--;
             loadLeaderboard(communityId, currentPage, limit, userId);
         }
     });
 
-    document.getElementById('next-page').addEventListener('click', function() {
+    document.getElementById('next-page').addEventListener('click', function () {
         currentPage++;
         loadLeaderboard(communityId, currentPage, limit, userId);
     });
@@ -43,46 +42,103 @@ function loadLeaderboard(communityId, page, limit, userId) {
     fetch(`http://localhost:3000/api/community-leaderboard?communityId=${communityId}&page=${page}&limit=${limit}&userId=${userId}`)
         .then(response => response.json())
         .then(data => {
-            var leaderboardBody = document.getElementById('leaderboard-body');
+            const leaderboardBody = document.getElementById('leaderboard-body');
             leaderboardBody.innerHTML = '';
 
-            data.forEach((entry) => {
-                var row = document.createElement('tr');
-                if (entry.userId === parseInt(userId)) {
-                    row.classList.add('highlight');
-                }
-                row.innerHTML = `
-                    <td>${entry.rank}</td>
-                    <td>${entry.username} ${entry.pinned ? '📌' : ''}</td>
-                    <td>${entry.current_points}</td>
-                    <td><button onclick="togglePin(${communityId}, ${userId}, ${entry.userId}, ${entry.pinned})">${entry.pinned ? 'Unpin' : 'Pin'}</button></td>
-                `;
-                leaderboardBody.appendChild(row);
-            });
+            if (data.leaderboard) {
+                data.leaderboard.forEach((entry) => {
+                    const row = document.createElement('tr');
+                    if (entry.userId === parseInt(userId)) {
+                        row.classList.add('highlight');
+                    }
+                    row.innerHTML = `
+                        <td>${entry.rank}</td>
+                        <td>${entry.username} ${entry.pinned ? '📌' : ''}</td>
+                        <td>${entry.current_points}</td>
+                        <td><button onclick="togglePin(${communityId}, ${userId}, ${entry.userId}, ${entry.pinned})">${entry.pinned ? 'Unpin' : 'Pin'}</button></td>
+                    `;
+                    leaderboardBody.appendChild(row);
+                });
+            }
 
-            document.getElementById('next-page').style.display = data.length < limit ? 'none' : 'inline';
+            document.getElementById('next-page').style.display = data.leaderboard.length < limit ? 'none' : 'inline';
             document.getElementById('prev-page').style.display = currentPage === 1 ? 'none' : 'inline';
+
+            displayTopUsers(data.topUsers);
+            displayCurrentUser(data.currentUser);
+            displayLastUser(data.lastUser);
+            displayPinnedUsers(data.pinnedUsers);
         })
         .catch(error => console.error('Error fetching leaderboard:', error));
+}
+
+function displayTopUsers(users) {
+    const topUsersList = document.getElementById('top-users-list');
+    topUsersList.innerHTML = '';
+    if (users) {
+        users.forEach(user => {
+            const listItem = document.createElement('li');
+            listItem.classList.add('list-group-item');
+            listItem.textContent = `${user.rank}. ${user.username} (${user.current_points} points)`;
+            topUsersList.appendChild(listItem);
+        });
+    }
+}
+
+function displayCurrentUser(user) {
+    const currentUserList = document.getElementById('current-user-list');
+    currentUserList.innerHTML = '';
+    if (user) {
+        const listItem = document.createElement('li');
+        listItem.classList.add('list-group-item');
+        listItem.textContent = `${user.rank}. ${user.username} (${user.current_points} points)`;
+        currentUserList.appendChild(listItem);
+    }
+}
+
+function displayLastUser(user) {
+    const lastUserList = document.getElementById('last-user-list');
+    lastUserList.innerHTML = '';
+    if (user) {
+        const listItem = document.createElement('li');
+        listItem.classList.add('list-group-item');
+        listItem.textContent = `${user.rank}. ${user.username} (${user.current_points} points)`;
+        lastUserList.appendChild(listItem);
+    }
+}
+
+function displayPinnedUsers(users) {
+    const pinnedUsersList = document.getElementById('pinned-users-list');
+    pinnedUsersList.innerHTML = '';
+    if (users) {
+        users.forEach(user => {
+            const listItem = document.createElement('li');
+            listItem.classList.add('list-group-item');
+            listItem.textContent = `${user.rank}. ${user.username} (${user.current_points} points)`;
+            pinnedUsersList.appendChild(listItem);
+        });
+    }
 }
 
 function searchUser(communityId, username, userId) {
     fetch(`http://localhost:3000/api/search-user?communityId=${communityId}&username=${username}`)
         .then(response => response.json())
         .then(data => {
-            var leaderboardBody = document.getElementById('leaderboard-body');
+            const leaderboardBody = document.getElementById('leaderboard-body');
             leaderboardBody.innerHTML = '';
 
-            data.forEach((entry) => {
-                var row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${entry.rank}</td>
-                    <td>${entry.username}</td>
-                    <td>${entry.current_points}</td>
-                    <td><button onclick="togglePin(${communityId}, ${userId}, ${entry.userId}, ${entry.pinned})">${entry.pinned ? 'Unpin' : 'Pin'}</button></td>
-                `;
-                leaderboardBody.appendChild(row);
-            });
+            if (data) {
+                data.forEach((entry) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${entry.rank}</td>
+                        <td>${entry.username}</td>
+                        <td>${entry.current_points}</td>
+                        <td><button onclick="togglePin(${communityId}, ${userId}, ${entry.userId}, ${entry.pinned})">${entry.pinned ? 'Unpin' : 'Pin'}</button></td>
+                    `;
+                    leaderboardBody.appendChild(row);
+                });
+            }
         })
         .catch(error => console.error('Error searching user:', error));
 }

@@ -42,9 +42,10 @@
             font-size: 20px;
             cursor: pointer;
         }
+
         .pinned {
-    background-color: #fff3cd;
-}
+            background-color: #fff3cd;
+        }
     </style>
 </head>
 
@@ -68,6 +69,26 @@
     <div class="container mt-5">
         <h2 id="community-name" class="text-center text-dark"></h2>
         <div class="leaderboard">
+            <div id="top-users" class="mt-4">
+                <h3>Top 3 Users</h3>
+                <ul id="top-users-list" class="list-group"></ul>
+            </div>
+
+            <div id="current-user" class="mt-4">
+                <h3>Current User</h3>
+                <ul id="current-user-list" class="list-group"></ul>
+            </div>
+
+            <div id="last-user" class="mt-4">
+                <h3>Last User</h3>
+                <ul id="last-user-list" class="list-group"></ul>
+            </div>
+
+            <div id="pinned-users" class="mt-4">
+                <h3>Pinned Users</h3>
+                <ul id="pinned-users-list" class="list-group"></ul>
+            </div>
+
             <table class="leaderboard-table">
                 <thead>
                     <tr>
