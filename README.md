@@ -6,24 +6,28 @@ This project is a web application built using Node.js and Express. It is designe
 
   - Registration: Users can register with a unique username.
   - Login Check: Users can check if they are already registered.
+  - 
 2. Community Management:
 
-Create Community: Users can create new communities if they are not already part of five communities.
-Join Community: Users can join existing communities if they are not already part of five communities.
-View User Communities: Users can view the communities they belong to.
-Sneak Peek: Users can get a preview of the leaderboard for communities they belong to.
-Betting System:
+  - Create Community: Users can create new communities if they are not already part of five communities.
+  - Join Community: Users can join existing communities if they are not already part of five communities.
+  - View User Communities: Users can view the communities they belong to.
+  - Sneak Peek: Users can get a preview of the leaderboard for communities they belong to.
 
-Upcoming Games: View the next three upcoming games.
-Place Bet: Users can place bets on upcoming games.
-Update Game Results: Admins can update the result of a game.
-Leaderboard:
+3. Betting System:
 
-Community Leaderboard: View the leaderboard for a specific community.
-Global Leaderboard: View the global leaderboard.
-Pinning Users: Users can pin or unpin other users in a community.
+  - Upcoming Games: View the next three upcoming games.
+  - Place Bet: Users can place bets on upcoming games.
+  - Update Game Results: Admins can update the result of a game.
 
-Setup and Installation
+4. Leaderboard:
+
+  - Community Leaderboard: View the leaderboard for a specific community.
+  - Global Leaderboard: View the global leaderboard.
+5. Pinning Users:
+  - Users can pin or unpin other users in a community.
+
+# Setup and Installation
 Clone the Repository:
 
 bash
