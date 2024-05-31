@@ -31,62 +31,68 @@ This project is a web application built using Node.js and Express. It is designe
 1. Clone the Repository:
 
 ```
-git clone <repository-url>
+git clone https://github.com/FlamurMaliqi/GenDev24
 cd <repository-directory>
 ```
 
-Install Dependencies:
+2., Install Dependencies:
 
-bash
-Code kopieren
-npm install
-Database Setup:
-Ensure you have SQLite installed. Create the necessary database and tables using the provided SQL scripts.
+```
+npm install <library>
+```
 
-Run the Server:
+3. Run the Server:
 
-bash
-Code kopieren
+```
 node server.js
+```
+
 The server will start and be accessible at http://localhost:3000.
 
-API Endpoints
-User Endpoints
-POST /check-user: Check if a user is registered.
-POST /register-user: Register a new user.
-Community Endpoints
-POST /create-community: Create a new community.
-POST /join-community: Join an existing community.
-GET /api/user-communities: Get communities of a user.
-GET /api/community: Get details of a specific community.
-GET /api/user-community-sneak-previews: Get sneak previews of all user communities.
-Betting Endpoints
-GET /api/upcoming-games: Get upcoming games.
-POST /api/place-bet: Place a bet on a game.
-POST /api/update-game-result: Update the result of a game.
-Leaderboard Endpoints
-GET /api/community-leaderboard: Get leaderboard for a community.
-GET /api/global-leaderboard: Get global leaderboard.
-GET /api/community-sneak-peek: Get sneak peek of a community leaderboard.
-Pinning Endpoints
-POST /api/pin-user: Pin or unpin a user in a community.
-Code Structure
-server.js: Main application file setting up the Express server and defining routes.
-database.js: Database configuration and setup using SQLite.
-public/: Directory for static files.
-game_schedule.csv: CSV file containing the schedule of games.
-Optimizations and Improvements
-Database Indexing: Ensure indexes on frequently queried columns to improve query performance.
-Caching: Implement caching for frequently accessed data like leaderboards and upcoming games to reduce database load.
-Input Validation: Enhance input validation and sanitation to improve security and data integrity.
-Error Handling: Implement a more robust error handling mechanism to provide better feedback and logging.
-Authentication: Add user authentication and authorization to secure endpoints and manage user access.
-Possible Future Enhancements
-Notification System: Notify users of upcoming games and bet results.
-Admin Panel: A dedicated admin panel for managing communities, users, and game results.
-Real-time Updates: Implement WebSocket or similar technology for real-time updates of leaderboards and game results.
-Mobile Support: Create a responsive design or a mobile application for better accessibility on mobile devices.
-This project provides a comprehensive platform for community-based betting with a focus on user engagement through communities and leaderboards. With further optimizations and enhancements, it can offer a robust and scalable solution for sports betting enthusiasts.
+# API Endpoints
+## User Endpoints
+
+  - POST /check-user: Check if a user is registered.
+  - POST /register-user: Register a new user.
+    
+## Community Endpoints
+
+  - POST /create-community: Create a new community.
+  - POST /join-community: Join an existing community.
+  - GET /api/user-communities: Get communities of a user.
+  - GET /api/community: Get details of a specific community.
+  - GET /api/user-community-sneak-previews: Get sneak previews of all user communities.
+
+## Betting Endpoints
+
+  - GET /api/upcoming-games: Get upcoming games.
+  - POST /api/place-bet: Place a bet on a game.
+  - POST /api/update-game-result: Update the result of a game.
+
+## Leaderboard Endpoints
+
+  - GET /api/community-leaderboard: Get leaderboard for a community.
+  - GET /api/global-leaderboard: Get global leaderboard.
+  - GET /api/community-sneak-peek: Get sneak peek of a community leaderboard.
+    
+## Pinning Endpoints
+
+  - POST /api/pin-user: Pin or unpin a user in a community.
+
+# Code Structure
+
+  - Server/server.js: Main application file setting up the Express server and defining routes.
+  - Server?database.js: Database configuration and setup using SQLite.
+  - Client/control: Directory for frontend logic.
+  - Client/view: Directory for view.
+  - Server/game_schedule.csv: CSV file containing the schedule of games.
+    
+
+# Possible Future Enhancements
+  - Notification System: Notify users of upcoming games and bet results.
+  - Admin Panel: A dedicated admin panel for managing communities, users, and game results.
+  - Real-time Updates: Implement WebSocket or similar technology for real-time updates of leaderboards and game results.
+  - Mobile Support: Create a responsive design or a mobile application for better accessibility on mobile devices.
 
 
 
