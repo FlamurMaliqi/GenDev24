@@ -82,7 +82,7 @@ The server will start and be accessible at http://localhost:3000.
 # Code Structure
 
   - Server/server.js: Main application file setting up the Express server and defining routes.
-  - Server?database.js: Database configuration and setup using SQLite.
+  - Server/database.js: Database configuration and setup using SQLite.
   - Client/control: Directory for frontend logic.
   - Client/view: Directory for view.
   - Server/game_schedule.csv: CSV file containing the schedule of games.
