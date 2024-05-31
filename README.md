@@ -4,8 +4,8 @@ This project is a web application built using Node.js and Express. It is designe
 # Features
 1. User Management:
 
-- Registration: Users can register with a unique username.
-- Login Check: Users can check if they are already registered.
+  - Registration: Users can register with a unique username.
+  - Login Check: Users can check if they are already registered.
 2. Community Management:
 
 Create Community: Users can create new communities if they are not already part of five communities.
