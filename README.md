@@ -30,10 +30,11 @@ This project is a web application built using Node.js and Express. It is designe
 # Setup and Installation
 1. Clone the Repository:
 
-'''
+```
 git clone <repository-url>
 cd <repository-directory>
-'''
+```
+
 Install Dependencies:
 
 bash
