@@ -6,7 +6,7 @@ This project is a web application built using Node.js and Express. It is designe
 
   - Registration: Users can register with a unique username.
   - Login Check: Users can check if they are already registered.
-  - 
+    
 2. Community Management:
 
   - Create Community: Users can create new communities if they are not already part of five communities.
@@ -28,12 +28,12 @@ This project is a web application built using Node.js and Express. It is designe
   - Users can pin or unpin other users in a community.
 
 # Setup and Installation
-Clone the Repository:
+1. Clone the Repository:
 
-bash
-Code kopieren
+'''
 git clone <repository-url>
 cd <repository-directory>
+'''
 Install Dependencies:
 
 bash
