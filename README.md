@@ -1,13 +1,12 @@
-## Community Betting Platform - README
-Overview
+# Overview
 This project is a web application built using Node.js and Express. It is designed to facilitate community-based betting on game outcomes. Users can register, join communities, place bets on upcoming games, and view leaderboards for their communities and globally.
 
-Features
-User Management:
+# Features
+1. User Management:
 
-Registration: Users can register with a unique username.
-Login Check: Users can check if they are already registered.
-Community Management:
+- Registration: Users can register with a unique username.
+- Login Check: Users can check if they are already registered.
+2. Community Management:
 
 Create Community: Users can create new communities if they are not already part of five communities.
 Join Community: Users can join existing communities if they are not already part of five communities.
