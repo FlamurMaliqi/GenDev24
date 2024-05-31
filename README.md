@@ -1,4 +1,4 @@
-Community Betting Platform - README
+## Community Betting Platform - README
 Overview
 This project is a web application built using Node.js and Express. It is designed to facilitate community-based betting on game outcomes. Users can register, join communities, place bets on upcoming games, and view leaderboards for their communities and globally.
 
